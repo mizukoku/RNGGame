@@ -1,6 +1,22 @@
 // ui/DebugMenu.js
 import { RARITIES, RARITY_ORDER } from '../config/RarityConfig.js';
 
+// Display order: rarest first
+const DISPLAY_ORDER = [...RARITY_ORDER].reverse();
+
+// Always format as 1/N — reads debugOdds from config if set,
+// otherwise computes from weight
+function formatOneIn(weight) {
+  const total = Object.values(RARITIES).reduce((s, r) => s + r.weight, 0);
+  const oneIn = total / weight;
+  if (oneIn < 10) return '1/' + oneIn.toFixed(1);
+  return '1/' + Math.round(oneIn).toLocaleString();
+}
+
+function getOddsLabel(rarity) {
+  return rarity.debugOdds ?? formatOneIn(rarity.weight);
+}
+
 const DEBUG_CSS = `
 #debug-menu {
   position: fixed;
@@ -35,25 +51,31 @@ const DEBUG_CSS = `
 #debug-panel {
   display: none;
   flex-direction: column;
-  gap: 0;
   background: rgba(8,8,14,0.97);
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 10px;
   overflow: hidden;
   margin-bottom: 10px;
-  min-width: 220px;
+  min-width: 240px;
+  max-height: 92vh;
+  overflow-y: auto;
   box-shadow: 0 8px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04);
   backdrop-filter: blur(12px);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.08) transparent;
 }
 #debug-panel.open { display: flex; }
 
 .dbg-header {
   padding: 10px 14px 8px;
-  background: rgba(255,255,255,0.03);
   border-bottom: 1px solid rgba(255,255,255,0.07);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: rgba(8,8,14,0.97);
 }
 .dbg-title {
   font-size: 0.65rem;
@@ -64,7 +86,7 @@ const DEBUG_CSS = `
 }
 .dbg-hint {
   font-size: 0.58rem;
-  color: rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.18);
   letter-spacing: 0.1em;
 }
 
@@ -85,28 +107,23 @@ const DEBUG_CSS = `
 .dbg-btn {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
   width: 100%;
   padding: 7px 14px;
   background: none;
   border: none;
   cursor: pointer;
   font-family: 'Rajdhani', monospace, sans-serif;
-  font-size: 0.82rem;
+  font-size: 0.83rem;
   font-weight: 600;
   color: var(--dbg-color, #fff);
   text-align: left;
   letter-spacing: 0.05em;
   transition: background 0.15s;
-  position: relative;
-  overflow: hidden;
 }
-.dbg-btn:hover {
-  background: rgba(255,255,255,0.06);
-}
-.dbg-btn:active {
-  background: rgba(255,255,255,0.1);
-}
+.dbg-btn:hover  { background: rgba(255,255,255,0.06); }
+.dbg-btn:active { background: rgba(255,255,255,0.1); }
+
 .dbg-btn-dot {
   width: 8px;
   height: 8px;
@@ -115,12 +132,28 @@ const DEBUG_CSS = `
   box-shadow: 0 0 8px var(--dbg-color, #fff);
   flex-shrink: 0;
 }
+.dbg-btn-badge {
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+.dbg-btn-key {
+  font-size: 0.58rem;
+  color: rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 3px;
+  padding: 1px 5px;
+  flex-shrink: 0;
+  font-family: monospace;
+}
 .dbg-btn-odds {
   margin-left: auto;
-  font-size: 0.62rem;
-  font-weight: 400;
-  color: rgba(255,255,255,0.2);
-  letter-spacing: 0.05em;
+  font-size: 0.63rem;
+  font-weight: 500;
+  color: var(--dbg-color, rgba(255,255,255,0.25));
+  opacity: 0.55;
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
 }
 
 .dbg-util-btn {
@@ -145,18 +178,6 @@ const DEBUG_CSS = `
   color: rgba(255,255,255,0.7);
 }
 
-.dbg-badge {
-  font-size: 0.6rem;
-  padding: 1px 6px;
-  border-radius: 100px;
-  border: 1px solid;
-  border-color: var(--dbg-color);
-  color: var(--dbg-color);
-  margin-left: 4px;
-  vertical-align: middle;
-  opacity: 0.8;
-}
-
 /* Playing indicator */
 .dbg-playing {
   display: flex;
@@ -166,6 +187,7 @@ const DEBUG_CSS = `
   font-size: 0.72rem;
   color: rgba(255,255,255,0.4);
   animation: dbgBlink 1s ease-in-out infinite;
+  border-top: 1px solid rgba(255,255,255,0.05);
 }
 @keyframes dbgBlink {
   0%,100%{opacity:.4} 50%{opacity:1}
@@ -175,17 +197,13 @@ const DEBUG_CSS = `
   border-radius: 50%;
   background: #4ade80;
   animation: dbgPulse .8s ease-in-out infinite;
+  flex-shrink: 0;
 }
 @keyframes dbgPulse {
-  0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(74,222,128,.6)}
-  50%{transform:scale(1.3);box-shadow:0 0 0 4px rgba(74,222,128,0)}
+  0%,100%{ transform:scale(1);   box-shadow:0 0 0 0 rgba(74,222,128,.6) }
+  50%    { transform:scale(1.3); box-shadow:0 0 0 4px rgba(74,222,128,0) }
 }
 `;
-
-const ODDS_MAP = {
-  COMMON: '60%', UNCOMMON: '25%', RARE: '10%',
-  EPIC: '4%', LEGENDARY: '0.9%', MYTHIC: '1/1000',
-};
 
 export class DebugMenu {
   constructor(rollEngine, playerState) {
@@ -211,73 +229,71 @@ export class DebugMenu {
     this._el = document.createElement('div');
     this._el.id = 'debug-menu';
 
-    // Panel
     this._panel = document.createElement('div');
     this._panel.id = 'debug-panel';
     this._panel.innerHTML = `
       <div class="dbg-header">
         <span class="dbg-title">🔧 Debug</span>
-        <span class="dbg-hint">` + '`' + ` to toggle</span>
+        <span class="dbg-hint">\` to toggle</span>
       </div>
 
       <div class="dbg-section">
         <div class="dbg-section-title">Fire Cutscene</div>
-        ${RARITY_ORDER.slice().reverse().map(id => {
-          const r = RARITIES[id];
-          const isMythic = id === 'MYTHIC';
+        ${DISPLAY_ORDER.map((id, i) => {
+          const r     = RARITIES[id];
+          const odds  = getOddsLabel(r);
+          const badge = r.badge ? `<span class="dbg-btn-badge">${r.badge}</span>` : '';
           return `
-            <button class="dbg-btn" data-scene="${r.cutscene}" data-rarity="${id}"
-              style="--dbg-color:${r.color}">
+            <button class="dbg-btn" data-rarity="${id}" style="--dbg-color:${r.color}">
               <span class="dbg-btn-dot"></span>
               ${r.label}
-              ${isMythic ? '<span class="dbg-badge">☄</span>' : ''}
-              <span class="dbg-btn-odds">${ODDS_MAP[id] ?? ''}</span>
+              ${badge}
+              <span class="dbg-btn-key">${i + 1}</span>
+              <span class="dbg-btn-odds">${odds}</span>
             </button>
           `;
         }).join('')}
       </div>
 
       <div class="dbg-section">
-        <div class="dbg-section-title">Luck</div>
-        <button class="dbg-util-btn" id="dbg-luck-streak">🍀 Lucky Streak (x1.5)</button>
-        <button class="dbg-util-btn" id="dbg-luck-holy">✨ Holy Light (x2.0)</button>
-        <button class="dbg-util-btn" id="dbg-luck-glimpse">⚡ Glimpse (x3.0)</button>
+        <div class="dbg-section-title">Luck Buffs</div>
+        <button class="dbg-util-btn" id="dbg-luck-streak">🍀 Lucky Streak  ×1.5 · 30s</button>
+        <button class="dbg-util-btn" id="dbg-luck-holy">✨ Holy Light  ×2.0 · 15s</button>
+        <button class="dbg-util-btn" id="dbg-luck-glimpse">⚡ Glimpse  ×3.0 · 5s</button>
       </div>
 
       <div class="dbg-section">
-        <div class="dbg-section-title">State</div>
+        <div class="dbg-section-title">Tools</div>
         <button class="dbg-util-btn" id="dbg-skip">⏭ Skip Cutscene</button>
         <button class="dbg-util-btn" id="dbg-clear-fx">💨 Clear Effects</button>
         <button class="dbg-util-btn" id="dbg-reset">⚠ Reset Save</button>
       </div>
     `;
 
-    // Toggle button
     const toggle = document.createElement('button');
-    toggle.id = 'debug-toggle';
-    toggle.title = 'Debug Menu (`)';
+    toggle.id        = 'debug-toggle';
+    toggle.title     = 'Debug Menu (`)';
     toggle.textContent = '🔧';
 
     this._el.appendChild(this._panel);
     this._el.appendChild(toggle);
     document.body.appendChild(this._el);
 
-    // Events
+    // Scene buttons
     toggle.addEventListener('click', () => this._togglePanel());
     this._panel.querySelectorAll('.dbg-btn[data-rarity]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const rarityId = btn.dataset.rarity;
-        this._fireScene(rarityId);
-      });
+      btn.addEventListener('click', () => this._fireScene(btn.dataset.rarity));
     });
 
+    // Luck
     document.getElementById('dbg-luck-streak')
-      ?.addEventListener('click', () => { this.rollEngine.activateLuck('streak'); this._toast('Lucky Streak ON'); });
+      ?.addEventListener('click', () => { this.rollEngine.activateLuck('streak');  this._toast('🍀 Lucky Streak active'); });
     document.getElementById('dbg-luck-holy')
-      ?.addEventListener('click', () => { this.rollEngine.activateLuck('holy'); this._toast('Holy Light ON'); });
+      ?.addEventListener('click', () => { this.rollEngine.activateLuck('holy');    this._toast('✨ Holy Light active'); });
     document.getElementById('dbg-luck-glimpse')
-      ?.addEventListener('click', () => { this.rollEngine.activateLuck('glimpse'); this._toast('Glimpse ON'); });
+      ?.addEventListener('click', () => { this.rollEngine.activateLuck('glimpse'); this._toast('⚡ Glimpse active'); });
 
+    // Tools
     document.getElementById('dbg-skip')
       ?.addEventListener('click', () => {
         this.rollEngine.engine?.cutsceneManager?.stop();
@@ -304,11 +320,10 @@ export class DebugMenu {
 
   _bindKeys() {
     document.addEventListener('keydown', e => {
-      if (e.key === '`' || e.key === '~') this._togglePanel();
-      // Number keys 1-6 fire rarities in order when panel is open
-      if (this._open && e.key >= '1' && e.key <= '6') {
-        const idx  = parseInt(e.key) - 1;
-        const id   = [...RARITY_ORDER].reverse()[idx];
+      if (e.key === '`' || e.key === '~') { this._togglePanel(); return; }
+      // 1–9 fire rarities rarest→common when panel is open
+      if (this._open && e.key >= '1' && e.key <= '9') {
+        const id = DISPLAY_ORDER[parseInt(e.key) - 1];
         if (id) this._fireScene(id);
       }
     });
@@ -316,34 +331,30 @@ export class DebugMenu {
 
   async _fireScene(rarityId) {
     if (this.rollEngine.rolling) return;
+    const rarity = RARITIES[rarityId];
+    if (!rarity) return;
 
-    const rarity  = RARITIES[rarityId];
-    const item    = this.rollEngine.rarityTable.rollItem(rarity);
-
-    // Show playing indicator
+    const item = this.rollEngine.rarityTable.rollItem(rarity);
     this._showPlaying(rarity);
 
     this.rollEngine.rolling = true;
     await this.rollEngine.engine.playCutscene(rarity.cutscene, rarity);
     this.rollEngine.rolling = false;
-
     this._hidePlaying();
 
-    // Trigger result display via UIManager callback if wired
     if (this.rollEngine.onRollComplete) {
       this.rollEngine.onRollComplete(rarity, item);
     }
   }
 
   _showPlaying(rarity) {
-    const old = this._panel.querySelector('.dbg-playing');
-    if (old) old.remove();
-
+    this._hidePlaying();
     const el = document.createElement('div');
     el.className = 'dbg-playing';
     el.innerHTML = `
       <span class="dbg-dot-pulse"></span>
       Playing: <strong style="color:${rarity.color}">${rarity.label}</strong>
+      <span style="opacity:.4;font-size:.65rem;margin-left:auto">${getOddsLabel(rarity)}</span>
     `;
     this._panel.appendChild(el);
   }
@@ -365,9 +376,6 @@ export class DebugMenu {
     t.textContent = msg;
     document.body.appendChild(t);
     requestAnimationFrame(() => t.style.opacity = '1');
-    setTimeout(() => {
-      t.style.opacity = '0';
-      setTimeout(() => t.remove(), 250);
-    }, 1800);
+    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 250); }, 1800);
   }
 }

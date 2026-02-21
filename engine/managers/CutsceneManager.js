@@ -1,9 +1,12 @@
 // engine/managers/CutsceneManager.js
-import { NormalScene }    from '../../cutscenes/NormalScene.js';
-import { RareScene }      from '../../cutscenes/RareScene.js';
-import { EpicScene }      from '../../cutscenes/EpicScene.js';
-import { LegendaryScene } from '../../cutscenes/LegendaryScene.js';
-import { CometStrike }    from '../../cutscenes/CometStrike.js';
+import { NormalScene }     from '../../cutscenes/NormalScene.js';
+import { RareScene }       from '../../cutscenes/RareScene.js';
+import { EpicScene }       from '../../cutscenes/EpicScene.js';
+import { LegendaryScene }  from '../../cutscenes/LegendaryScene.js';
+import { CometStrike }     from '../../cutscenes/CometStrike.js';
+import { StellarCollapse } from '../../cutscenes/Stellarcollapse.js';
+import { Supernova }       from '../../cutscenes/Supernova.js';
+import { Seraphim }        from '../../cutscenes/Seraphim.js';
 
 const SCENE_MAP = {
   NormalScene,
@@ -11,6 +14,9 @@ const SCENE_MAP = {
   EpicScene,
   LegendaryScene,
   CometStrike,
+  StellarCollapse,
+  Supernova,
+  Seraphim,
 };
 
 export class CutsceneManager {
