@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RNG GAME</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Starfield background -->
+  <canvas id="starfield"></canvas>
+
+  <!-- FX canvas (injected by RenderEngine) -->
+
+  <!-- Main layout -->
+  <div class="app">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header__logo">
+        <span class="header__sol">RNG</span><span class="header__rng">GAME</span>
+      </div>
+      <div class="header__tagline">Summon Your Fate</div>
+    </header>
+
+    <!-- Main content area -->
+    <main class="main">
+
+      <!-- Left panel: Stats + Odds -->
+      <aside class="panel panel--left">
+        <div class="panel__section">
+          <h3 class="panel__title">YOUR STATS</h3>
+          <div id="stats-panel" class="stats-panel"></div>
+        </div>
+        <div class="panel__section">
+          <h3 class="panel__title">ODDS</h3>
+          <div id="odds-panel" class="odds-panel"></div>
+        </div>
+        <div class="panel__section panel__section--controls">
+          <button id="luck-btn" class="ctrl-btn ctrl-btn--luck">🍀 Lucky Streak</button>
+          <button id="reset-btn" class="ctrl-btn ctrl-btn--reset">↺ Reset</button>
+        </div>
+      </aside>
+
+      <!-- Center: Roll area -->
+      <section class="center">
+        <div id="result-container" class="result-container"></div>
+        <div id="btn-container" class="btn-container"></div>
+        <button id="auto-roll-btn" class="auto-btn">AUTO ROLL</button>
+      </section>
+
+      <!-- Right panel: Inventory -->
+      <aside class="panel panel--right">
+        <div class="panel__section">
+          <h3 class="panel__title">COLLECTION</h3>
+          <div id="inventory-panel" class="inventory-panel"></div>
+        </div>
+      </aside>
+
+    </main>
+
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
