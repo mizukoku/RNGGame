@@ -3,22 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RNG GAME</title>
+  <title>RNG GAME — Summon Your Fate</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-  <!-- Starfield background -->
   <canvas id="starfield"></canvas>
 
-  <!-- FX canvas (injected by RenderEngine) -->
-
-  <!-- Main layout -->
   <div class="app">
 
-    <!-- Header -->
     <header class="header">
       <div class="header__logo">
         <span class="header__sol">RNG</span><span class="header__rng">GAME</span>
@@ -26,10 +21,9 @@
       <div class="header__tagline">Summon Your Fate</div>
     </header>
 
-    <!-- Main content area -->
     <main class="main">
 
-      <!-- Left panel: Stats + Odds -->
+      <!-- Left panel: Stats + Odds + Controls -->
       <aside class="panel panel--left">
         <div class="panel__section">
           <h3 class="panel__title">YOUR STATS</h3>
@@ -47,17 +41,17 @@
 
       <!-- Center: Roll area -->
       <section class="center">
+        <!-- Active luck multiplier badge -->
+        <div id="luck-indicator" class="luck-indicator" style="display:none"></div>
+
         <div id="result-container" class="result-container"></div>
         <div id="btn-container" class="btn-container"></div>
         <button id="auto-roll-btn" class="auto-btn">AUTO ROLL</button>
       </section>
 
-      <!-- Right panel: Inventory -->
+      <!-- Right panel: Collection + Craft tabs -->
       <aside class="panel panel--right">
-        <div class="panel__section">
-          <h3 class="panel__title">COLLECTION</h3>
-          <div id="inventory-panel" class="inventory-panel"></div>
-        </div>
+        <div id="craft-container" class="craft-container"></div>
       </aside>
 
     </main>

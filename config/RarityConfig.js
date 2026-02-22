@@ -1,17 +1,10 @@
 // config/RarityConfig.js
 //
-// Weight pool ≈ 1002.3  (total / weight = odds)
+// Weight pool ≈ 1002.35
 // All debugOdds expressed as 1/N strings.
-//
-// To add a rarity:
-//   1. Add entry here
-//   2. Add cutscene to /cutscenes/
-//   3. Register in CutsceneManager.js
-//   4. Add to PlayerState.rollsSinceLast for pity tracking
 //
 export const RARITIES = {
 
-  // ── COMMON  (~1/2) ──────────────────────────────────────────
   COMMON: {
     id: 'COMMON', label: 'Common', weight: 600, debugOdds: '1/2', badge: '',
     color: '#a8b5c8', glowColor: 'rgba(168,181,200,0.4)', particleColor: '#c0ccd8',
@@ -25,7 +18,6 @@ export const RARITIES = {
     ],
   },
 
-  // ── UNCOMMON  (~1/4) ────────────────────────────────────────
   UNCOMMON: {
     id: 'UNCOMMON', label: 'Uncommon', weight: 250, debugOdds: '1/4', badge: '',
     color: '#4ade80', glowColor: 'rgba(74,222,128,0.5)', particleColor: '#86efac',
@@ -39,7 +31,6 @@ export const RARITIES = {
     ],
   },
 
-  // ── RARE  (~1/10) ───────────────────────────────────────────
   RARE: {
     id: 'RARE', label: 'Rare', weight: 100, debugOdds: '1/10', badge: '💎',
     color: '#60a5fa', glowColor: 'rgba(96,165,250,0.6)', particleColor: '#93c5fd',
@@ -53,7 +44,6 @@ export const RARITIES = {
     ],
   },
 
-  // ── EPIC  (~1/25) ───────────────────────────────────────────
   EPIC: {
     id: 'EPIC', label: 'Epic', weight: 40, debugOdds: '1/25', badge: '💜',
     color: '#c084fc', glowColor: 'rgba(192,132,252,0.7)', particleColor: '#d8b4fe',
@@ -67,7 +57,6 @@ export const RARITIES = {
     ],
   },
 
-  // ── LEGENDARY  (~1/111) ─────────────────────────────────────
   LEGENDARY: {
     id: 'LEGENDARY', label: 'Legendary', weight: 9, debugOdds: '1/111', badge: '👑',
     color: '#fbbf24', glowColor: 'rgba(251,191,36,0.8)', particleColor: '#fde68a',
@@ -82,7 +71,6 @@ export const RARITIES = {
     ],
   },
 
-  // ── MYTHIC  (~1/500) ────────────────────────────────────────
   MYTHIC: {
     id: 'MYTHIC', label: 'Mythic', weight: 2, debugOdds: '1/500', badge: '☄',
     color: '#ffe066', glowColor: 'rgba(255,224,102,0.9)', particleColor: '#fff3a0',
@@ -96,7 +84,6 @@ export const RARITIES = {
     ],
   },
 
-  // ── DIVINE  (~1/1,000) ──────────────────────────────────────
   DIVINE: {
     id: 'DIVINE', label: 'Divine', weight: 1, debugOdds: '1/1,000', badge: '✦',
     color: '#cc88ff', glowColor: 'rgba(160,60,255,0.95)', particleColor: '#e0aaff',
@@ -117,16 +104,12 @@ export const RARITIES = {
     ],
   },
 
-  // ── SUPERNOVA  (~1/5,000) ────────────────────────────────────
-  // weight 0.2  → pool ≈ 1002.3 / 0.2 ≈ 5,012
+  // weight 0.2 → 1002.35 / 0.2 ≈ 5,012
   SUPERNOVA: {
     id: 'SUPERNOVA', label: 'Supernova', weight: 0.2, debugOdds: '1/5,000', badge: '💥',
     color: '#ff6600', glowColor: 'rgba(255,102,0,0.95)', particleColor: '#ffcc00',
     bgColor: 'rgba(12,2,0,0.99)',
-    textShadow: [
-      '0 0 30px rgba(255,102,0,1)', '0 0 70px rgba(255,0,100,0.9)',
-      '0 0 140px rgba(140,0,255,0.6)', '0 0 220px rgba(0,150,255,0.3)',
-    ].join(', '),
+    textShadow: '0 0 30px rgba(255,102,0,1), 0 0 70px rgba(255,0,100,0.9), 0 0 140px rgba(140,0,255,0.6), 0 0 220px rgba(0,150,255,0.3)',
     cutscene: 'Supernova',
     effects: {
       shakeIntensity: 40, particleCount: 160, rayCount: 28, ringCount: 6,
@@ -141,16 +124,12 @@ export const RARITIES = {
     ],
   },
 
-  // ── SERAPHIM  (~1/10,000) ────────────────────────────────────
-  // weight 0.1  → pool ≈ 1002.3 / 0.1 ≈ 10,023
+  // weight 0.1 → 1002.35 / 0.1 ≈ 10,024
   SERAPHIM: {
     id: 'SERAPHIM', label: 'Seraphim', weight: 0.1, debugOdds: '1/10,000', badge: '🔥',
     color: '#ffd700', glowColor: 'rgba(255,215,0,0.98)', particleColor: '#fff5a0',
     bgColor: 'rgba(14,8,0,0.99)',
-    textShadow: [
-      '0 0 30px rgba(255,215,0,1)', '0 0 70px rgba(255,140,0,0.95)',
-      '0 0 140px rgba(255,80,0,0.7)', '0 0 240px rgba(255,200,0,0.4)',
-    ].join(', '),
+    textShadow: '0 0 30px rgba(255,215,0,1), 0 0 70px rgba(255,140,0,0.95), 0 0 140px rgba(255,80,0,0.7), 0 0 240px rgba(255,200,0,0.4)',
     cutscene: 'Seraphim',
     effects: {
       shakeIntensity: 45, particleCount: 180, rayCount: 32, ringCount: 6,
@@ -166,15 +145,42 @@ export const RARITIES = {
     ],
   },
 
+  // weight 0.05 → 1002.35 / 0.05 ≈ 20,047
+  CONVERGENCE: {
+    id: 'CONVERGENCE', label: 'Convergence', weight: 0.05, debugOdds: '1/20,000', badge: '∞',
+    color: '#ffffff',
+    glowColor: 'rgba(255,255,255,0.98)',
+    particleColor: '#ffffff',
+    bgColor: 'rgba(0,0,0,1)',
+    textShadow: [
+      '0 0 30px rgba(255,255,255,1)',
+      '0 0 70px rgba(255,200,100,0.9)',
+      '0 0 140px rgba(200,100,255,0.8)',
+      '0 0 240px rgba(0,180,255,0.6)',
+      '0 0 360px rgba(255,80,0,0.4)',
+    ].join(', '),
+    cutscene: 'Convergence',
+    effects: {
+      shakeIntensity: 55, particleCount: 220, rayCount: 40, ringCount: 8,
+      glowMaxAlpha: 1.0, trailEnabled: true,
+      titleText: 'THE CONVERGENCE', subtitleText: '∞  1 / 20,000  ∞',
+    },
+    items: [
+      { id: 'convergence_echo',   name: 'Convergence Echo',   icon: '∞' },
+      { id: 'prismatic_shard',    name: 'Prismatic Shard',    icon: '🌈' },
+      { id: 'unified_singularity',name: 'Unified Singularity',icon: '⚪' },
+      { id: 'all_memory',         name: 'All Memory',         icon: '💭' },
+    ],
+  },
+
 };
 
-// ── Ordered most common → rarest ────────────────────────────────
+// Ordered most common → rarest
 export const RARITY_ORDER = [
   'COMMON', 'UNCOMMON', 'RARE', 'EPIC', 'LEGENDARY',
-  'MYTHIC', 'DIVINE', 'SUPERNOVA', 'SERAPHIM',
+  'MYTHIC', 'DIVINE', 'SUPERNOVA', 'SERAPHIM', 'CONVERGENCE',
 ];
 
-// ── Roll helper ──────────────────────────────────────────────────
 export function getRarityByWeight(roll) {
   const total = Object.values(RARITIES).reduce((s, r) => s + r.weight, 0);
   let cursor = 0;

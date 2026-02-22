@@ -2,24 +2,19 @@
 import { RollButton }    from './RollButton.js';
 import { ResultDisplay } from './ResultDisplay.js';
 import { DebugMenu }     from './DebugMenu.js';
+import { CraftingPanel } from './CraftingPanel.js';
 import { RARITY_ORDER, RARITIES } from '../config/RarityConfig.js';
 
-// ── Odds formatting — always 1/N, never % ────────────────────
+// ── Odds formatting — always 1/N ──────────────────────────────
 function formatOneIn(weight) {
   const total = Object.values(RARITIES).reduce((s, r) => s + r.weight, 0);
   const oneIn = total / weight;
   if (oneIn < 10) return '1/' + oneIn.toFixed(1);
   return '1/' + Math.round(oneIn).toLocaleString();
 }
+function getOddsLabel(r) { return r.debugOdds ?? formatOneIn(r.weight); }
 
-function getOddsLabel(rarity) {
-  return rarity.debugOdds ?? formatOneIn(rarity.weight);
-}
-
-// ── Toast trigger threshold ───────────────────────────────────
-// Any rarity rarer than 1/25 gets a toast (weight < 40)
 const TOAST_WEIGHT_THRESHOLD = 40;
-
 function buildToast(rarity) {
   const odds  = getOddsLabel(rarity);
   const badge = rarity.badge ? rarity.badge + ' ' : '';
@@ -33,27 +28,45 @@ export class UIManager {
     this.rollButton    = null;
     this.resultDisplay = null;
     this.statsEl       = null;
-    this.inventoryEl   = null;
+    this.craftingPanel = null;
     this.debugMenu     = null;
     this._init();
   }
 
   _init() {
     // Roll button
-    const btnContainer = document.getElementById('btn-container');
-    this.rollButton = new RollButton(btnContainer, () => this._handleRoll());
+    this.rollButton = new RollButton(
+      document.getElementById('btn-container'),
+      () => this._handleRoll()
+    );
 
     // Result display
-    const resultContainer = document.getElementById('result-container');
-    this.resultDisplay = new ResultDisplay(resultContainer);
+    this.resultDisplay = new ResultDisplay(
+      document.getElementById('result-container')
+    );
 
-    // Panel refs
-    this.statsEl     = document.getElementById('stats-panel');
-    this.inventoryEl = document.getElementById('inventory-panel');
+    // Stats
+    this.statsEl = document.getElementById('stats-panel');
 
-    // Initial renders
+    // Luck indicator (shows active multiplier)
+    this._luckEl = document.getElementById('luck-indicator');
+
+    // Odds panel
     this._renderOdds();
+
+    // Initial stats
     this.updateStats();
+
+    // Crafting panel — right panel body
+    const craftContainer = document.getElementById('craft-container');
+    if (craftContainer) {
+      this.craftingPanel = new CraftingPanel(
+        craftContainer,
+        this.rollEngine,
+        this.playerState,
+        (buff) => this._onCraft(buff)
+      );
+    }
 
     // Auto-roll
     const autoBtn = document.getElementById('auto-roll-btn');
@@ -76,32 +89,31 @@ export class UIManager {
     }
 
     // Reset
-    const resetBtn = document.getElementById('reset-btn');
-    if (resetBtn) {
-      resetBtn.addEventListener('click', () => {
-        if (confirm('Reset all progress?')) {
+    document.getElementById('reset-btn')
+      ?.addEventListener('click', () => {
+        if (confirm('Reset all progress? This clears inventory, buffs, and stats.')) {
           this.playerState.reset();
           this.resultDisplay.reset();
           this.updateStats();
+          this.craftingPanel?.refresh();
         }
       });
-    }
 
     // Luck button
-    const luckBtn = document.getElementById('luck-btn');
-    if (luckBtn) {
-      luckBtn.addEventListener('click', () => {
+    document.getElementById('luck-btn')
+      ?.addEventListener('click', () => {
         this.rollEngine.activateLuck('streak');
         this._showToast('🍀 Lucky Streak activated! (30s)', '#4ade80');
+        this._updateLuckIndicator();
       });
-    }
 
-    // Debug menu — single source of truth for onRollComplete
+    // Debug menu — owns onRollComplete as single source of truth
     this.debugMenu = new DebugMenu(this.rollEngine, this.playerState);
     this.rollEngine.onRollComplete = (rarity, item) => {
       this.resultDisplay.showResult(rarity, item);
       this.updateStats();
-      if (item) this._updateInventory(item, rarity);
+      this.craftingPanel?.refresh();
+      this._updateLuckIndicator();
       if (rarity.weight < TOAST_WEIGHT_THRESHOLD) {
         this._showToast(buildToast(rarity), rarity.color);
       }
@@ -113,19 +125,27 @@ export class UIManager {
     this.rollButton.setDisabled(true);
     this.resultDisplay.reset();
     await this.rollEngine.roll();
-    // onRollComplete handles display, stats, inventory, toast
     this.rollButton.setDisabled(false);
   }
 
-  // ── Odds panel — rarest first, all 1/N format ────────────────
+  // ── Craft callback ────────────────────────────────────────────
+  _onCraft(buff) {
+    this.updateStats();
+    this._updateLuckIndicator();
+    this._showToast(
+      `${buff.icon} ${buff.name} crafted! ×${buff.multiplier} luck · ${buff.rolls} rolls`,
+      buff.color
+    );
+  }
+
+  // ── Odds panel ────────────────────────────────────────────────
   _renderOdds() {
     const el = document.getElementById('odds-panel');
     if (!el) return;
-
     el.innerHTML = [...RARITY_ORDER].reverse().map(id => {
-      const r    = RARITIES[id];
+      const r   = RARITIES[id];
       const odds = getOddsLabel(r);
-      const badge = r.badge ? `<span style="opacity:0.55;margin-right:3px">${r.badge}</span>` : '';
+      const badge = r.badge ? `<span style="opacity:.55;margin-right:3px">${r.badge}</span>` : '';
       return `
         <div class="odds-row">
           <span class="odds-label" style="color:${r.color}">${badge}${r.label}</span>
@@ -135,34 +155,31 @@ export class UIManager {
     }).join('');
   }
 
-  // ── Stats panel ──────────────────────────────────────────────
+  // ── Stats panel ───────────────────────────────────────────────
   updateStats() {
     if (!this.statsEl) return;
     const ps = this.playerState;
 
-    // Rarity breakdown — rarest first, only show tiers the player has rolled
     const rarityRows = [...RARITY_ORDER].reverse()
       .filter(id => ps.getRarityCount(id) > 0)
       .map(id => {
-        const r     = RARITIES[id];
-        const badge = r.badge ? r.badge + ' ' : '';
+        const r = RARITIES[id];
         return `
           <div class="stat-row">
-            <span style="color:${r.color}">${badge}${r.label}</span>
+            <span style="color:${r.color}">${r.badge ? r.badge + ' ' : ''}${r.label}</span>
             <span class="stat-val" style="color:${r.color}">${ps.getRarityCount(id)}</span>
           </div>
         `;
       }).join('');
 
-    // Pity counters — only show tracked tiers
     const pityRows = Object.entries(ps.rollsSinceLast)
       .filter(([id]) => RARITIES[id])
       .map(([id, count]) => {
         const r = RARITIES[id];
         return `
           <div class="stat-row">
-            <span style="color:${r.color};opacity:0.65">Pity · ${r.label}</span>
-            <span class="stat-val" style="color:${r.color};opacity:0.8">${count}</span>
+            <span style="color:${r.color};opacity:.65">Pity · ${r.label}</span>
+            <span class="stat-val" style="color:${r.color};opacity:.8">${count}</span>
           </div>
         `;
       }).join('');
@@ -175,35 +192,36 @@ export class UIManager {
       ${rarityRows}
       ${pityRows ? `<div style="height:4px"></div>${pityRows}` : ''}
     `;
+
+    this._updateLuckIndicator();
   }
 
-  // ── Inventory panel ──────────────────────────────────────────
-  _updateInventory(item, rarity) {
-    if (!this.inventoryEl || !item) return;
-    const count = this.playerState.getInventoryCount(item.id);
+  // ── Luck indicator — shows current multiplier ─────────────────
+  _updateLuckIndicator() {
+    const el = this._luckEl;
+    if (!el) return;
+    const mult = this.rollEngine.getLuckMultiplier();
+    const buffs = this.rollEngine.craftingSystem.getActiveBuffs();
 
-    let card = this.inventoryEl.querySelector(`[data-item="${item.id}"]`);
-    if (!card) {
-      card = document.createElement('div');
-      card.className = 'inv-card';
-      card.setAttribute('data-item', item.id);
-      card.style.setProperty('--card-color', rarity.color);
-      card.style.setProperty('--card-glow',  rarity.glowColor);
-      this.inventoryEl.prepend(card);
+    if (mult <= 1.01 && buffs.length === 0) {
+      el.textContent = '';
+      el.style.display = 'none';
+      return;
     }
 
-    card.innerHTML = `
-      <span class="inv-card__icon">${item.icon}</span>
-      <span class="inv-card__name">${item.name}</span>
-      <span class="inv-card__count">x${count}</span>
+    el.style.display = 'block';
+    el.innerHTML = `
+      <span class="li-label">LUCK</span>
+      <span class="li-mult">×${mult.toFixed(2)}</span>
+      ${buffs.map(b => `
+        <span class="li-buff" style="--bc:${b.color}" title="${b.name}">
+          ${b.icon} <span>${b.rollsRemaining}</span>
+        </span>
+      `).join('')}
     `;
-
-    card.classList.remove('inv-card--new');
-    void card.offsetWidth;
-    card.classList.add('inv-card--new');
   }
 
-  // ── Toast ────────────────────────────────────────────────────
+  // ── Toast ─────────────────────────────────────────────────────
   _showToast(message, color = '#fff') {
     const toast = document.createElement('div');
     toast.className = 'toast';
