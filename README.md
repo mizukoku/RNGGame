@@ -1,4 +1,4 @@
-# SolRngOnline
+# RNG GAME
 
 A browser-based RNG aura rolling game with rarity-based cutscenes, visual effects, luck modifiers, and persistent player progress.
 
@@ -41,6 +41,7 @@ A browser-based RNG aura rolling game with rarity-based cutscenes, visual effect
 ├─ styles.css
 ├─ README.md
 ├─ config/
+|  ├─ CraftingConfig.js
 │  ├─ EngineConfig.js
 │  └─ RarityConfig.js
 ├─ cutscenes/
@@ -63,11 +64,13 @@ A browser-based RNG aura rolling game with rarity-based cutscenes, visual effect
 │     ├─ Easing.js
 │     └─ MathUtil.js
 ├─ game/
+│  ├─ CraftingSystem.js
 │  ├─ LuckSystem.js
 │  ├─ PlayerState.js
 │  ├─ RarityTable.js
 │  └─ RollEngine.js
 └─ ui/
+	├─ CraftingPanel.js
 	├─ DebugMenu.js
 	├─ ResultDisplay.js
 	├─ RollButton.js
@@ -82,6 +85,7 @@ A browser-based RNG aura rolling game with rarity-based cutscenes, visual effect
 
 ### `config/`
 
+- `CraftingConfig.js`: Recipes consumable items and grant luck multipliers for N rolls.
 - `EngineConfig.js`: Global engine constants (canvas/render/timing/shake settings).
 - `RarityConfig.js`: Rarity definitions, item pools, cutscene mapping, roll helpers.
 
@@ -108,6 +112,7 @@ A browser-based RNG aura rolling game with rarity-based cutscenes, visual effect
 
 ### `game/`
 
+- `CraftingSystem.js`: Logic for crafting items (checks, deductings etc).
 - `LuckSystem.js`: Luck modifiers (timed/permanent) and multiplier calculation.
 - `PlayerState.js`: Local save/load for stats, pity, inventory, and progression.
 - `RarityTable.js`: Weighted rarity rolling and item selection logic.
@@ -115,6 +120,7 @@ A browser-based RNG aura rolling game with rarity-based cutscenes, visual effect
 
 ### `ui/`
 
+- `CraftingPanel.js`: Renders crafting panel with recipes.
 - `DebugMenu.js`: In-game debug controls (force rarity, luck buffs, reset/clear actions).
 - `ResultDisplay.js`: Result card rendering and rarity-specific display states.
 - `RollButton.js`: Interactive roll button behavior and state handling.

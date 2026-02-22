@@ -20,7 +20,6 @@
 
 import { ParticleBurst, ContinuousParticles } from '../effects/ParticleBurst.js';
 import { GlowOverlay, RayBurst }               from '../effects/GlowOverlay.js';
-import { RevealText }                           from '../effects/RevealText.js';
 
 // ── Echo color palette (one per past cutscene) ────────────────
 const ECHO_COLORS = {
@@ -37,11 +36,11 @@ const CSS = `
   position:fixed;inset:0;
   background:#000;
   z-index:9990;pointer-events:none;
-  animation:cvVoidFade 5s ease forwards;
+  opacity:1;
+  transition:opacity 1.4s ease;
 }
-@keyframes cvVoidFade {
-  0%{opacity:1} 90%{opacity:1} 100%{opacity:0}
-}
+/* JS adds this class at 11s to trigger the fade-out */
+.cv-void--fade { opacity:0; pointer-events:none; }
 
 /* Heartbeat glow from centre */
 .cv-heartbeat {
@@ -383,7 +382,10 @@ export class Convergence {
       _spawned = [];
 
       // ── Phase 0: Absolute void + heartbeat ─────────────────
-      spawn(mk('cv-void'));
+      const voidEl = spawn(mk('cv-void'));
+      // Fade void out near end — covers full 13s cutscene
+      this._after(11000, () => voidEl.classList.add('cv-void--fade'));
+      this._after(12600, () => voidEl.remove());
       const hb = spawn(mk('cv-heartbeat'));
 
       // ── Phase 1: Four echoes materialize ───────────────────
@@ -591,7 +593,7 @@ export class Convergence {
 
       // ── Phase 7: Text reveal ────────────────────────────────
       this._after(6500, () => {
-        // DOM label with hue-rotating filter (all colors cycle)
+        // DOM label — hue-rotating filter cycles all colors
         const label = spawn(mk('cv-label'));
         const the   = document.createElement('div');
         the.className = 'cv-label-the';
@@ -612,24 +614,6 @@ export class Convergence {
         label.appendChild(main);
         label.appendChild(sub);
         this._after(4200, () => label.remove());
-
-        // Canvas text — chromatic gradient that shifts
-        this._after(400, () => {
-          // Draw the text twice: once in each of the two anchor colors,
-          // creating a layered spectral look through RevealText
-          this.engine.addEffect(new RevealText({
-            text:     this.fx.titleText,
-            subtext:  this.fx.subtitleText,
-            color:    '#ffffff',
-            glowColor: 'rgba(255,255,255,0.9)',
-            shadow:   true,
-            duration: 6500,
-            font:     'bold 64px Cinzel, serif',
-            subFont:  '20px Rajdhani, sans-serif',
-            subColor: 'rgba(255,235,180,0.9)',
-            y:        0.44,
-          }));
-        });
       });
 
       // ── Phase 8: Resolve ────────────────────────────────────

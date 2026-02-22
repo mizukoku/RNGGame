@@ -8,6 +8,8 @@ import { StellarCollapse }from '../../cutscenes/StellarCollapse.js';
 import { Supernova }      from '../../cutscenes/Supernova.js';
 import { Seraphim }       from '../../cutscenes/Seraphim.js';
 import { Convergence }    from '../../cutscenes/Convergence.js';
+import { Matrix }         from '../../cutscenes/Matrix.js';
+import { Eldritch }       from '../../cutscenes/Eldritch.js';
 
 const SCENE_MAP = {
   NormalScene,
@@ -19,6 +21,8 @@ const SCENE_MAP = {
   Supernova,
   Seraphim,
   Convergence,
+  Matrix,
+  Eldritch,
 };
 
 export class CutsceneManager {

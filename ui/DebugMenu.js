@@ -28,7 +28,7 @@ const DEBUG_CSS = `
 #debug-panel {
   display:none;flex-direction:column;
   background:rgba(8,8,14,.97);border:1px solid rgba(255,255,255,.1);
-  border-radius:10px;overflow:hidden;margin-bottom:10px;min-width:245px;
+  border-radius:10px;overflow:hidden;margin-bottom:10px;min-width:260px;
   max-height:92vh;overflow-y:auto;
   box-shadow:0 8px 40px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.04);
   backdrop-filter:blur(12px);
@@ -67,6 +67,37 @@ const DEBUG_CSS = `
   margin-left:auto;font-size:.63rem;font-weight:500;
   color:var(--dbg-color,rgba(255,255,255,.25));opacity:.55;letter-spacing:.03em;flex-shrink:0;
 }
+/* Matrix row gets green terminal treatment */
+.dbg-btn[data-rarity="MATRIX"] {
+  font-family:'Courier New',monospace;letter-spacing:.1em;
+  background:linear-gradient(90deg,rgba(0,255,65,.06) 0%,transparent 100%);
+}
+.dbg-btn[data-rarity="MATRIX"]:hover {
+  background:linear-gradient(90deg,rgba(0,255,65,.14) 0%,rgba(0,180,50,.04) 100%);
+}
+/* Convergence row — subtle rainbow shimmer */
+.dbg-btn[data-rarity="CONVERGENCE"] {
+  background:linear-gradient(90deg,rgba(255,255,255,.04) 0%,transparent 100%);
+}
+.dbg-btn[data-rarity="CONVERGENCE"]:hover {
+  background:linear-gradient(90deg,rgba(255,255,255,.09) 0%,rgba(255,200,100,.05) 100%);
+}
+
+/* Eldritch row — violet cosmic dread styling */
+.dbg-btn[data-rarity="ELDRITCH"] {
+  font-family:'Georgia',serif;font-style:italic;
+  background:linear-gradient(90deg,rgba(139,43,226,.08) 0%,transparent 100%);
+}
+.dbg-btn[data-rarity="ELDRITCH"]:hover {
+  background:linear-gradient(90deg,rgba(139,43,226,.16) 0%,rgba(75,0,130,.06) 100%);
+}
+.dbg-btn[data-rarity="ELDRITCH"] .dbg-btn-dot {
+  animation:elDotPulse 1.4s ease-in-out infinite;
+}
+@keyframes elDotPulse {
+  0%,100%{transform:scale(1);box-shadow:0 0 8px #c084fc}
+  50%    {transform:scale(1.5);box-shadow:0 0 16px #8b2be2,0 0 30px rgba(139,43,226,.5)}
+}
 .dbg-util-btn{
   width:calc(100% - 28px);margin:4px 14px;padding:6px 10px;
   background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
@@ -90,20 +121,12 @@ const DEBUG_CSS = `
   0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(74,222,128,.6)}
   50%    {transform:scale(1.3);box-shadow:0 0 0 4px rgba(74,222,128,0)}
 }
-/* Special glow for Convergence row */
-.dbg-btn[data-rarity="CONVERGENCE"] {
-  background:linear-gradient(90deg,rgba(255,255,255,.04) 0%,transparent 100%);
-}
-.dbg-btn[data-rarity="CONVERGENCE"]:hover {
-  background:linear-gradient(90deg,rgba(255,255,255,.09) 0%,rgba(255,200,100,.05) 100%);
-}
 `;
 
 export class DebugMenu {
   constructor(rollEngine, playerState) {
     this.rollEngine  = rollEngine;
     this.playerState = playerState;
-    this._el         = null;
     this._panel      = null;
     this._open       = false;
     this._inject();
@@ -120,8 +143,8 @@ export class DebugMenu {
   }
 
   _render() {
-    this._el = document.createElement('div');
-    this._el.id = 'debug-menu';
+    const root = document.createElement('div');
+    root.id = 'debug-menu';
 
     this._panel = document.createElement('div');
     this._panel.id = 'debug-panel';
@@ -134,14 +157,15 @@ export class DebugMenu {
       <div class="dbg-section">
         <div class="dbg-section-title">Fire Cutscene</div>
         ${DISPLAY_ORDER.map((id, i) => {
-          const r    = RARITIES[id];
-          const odds = getOddsLabel(r);
+          const r     = RARITIES[id];
+          const odds  = getOddsLabel(r);
           const badge = r.badge ? `<span class="dbg-btn-badge">${r.badge}</span>` : '';
+          const key   = i < 9 ? `<span class="dbg-btn-key">${i + 1}</span>` : '';
           return `
             <button class="dbg-btn" data-rarity="${id}" style="--dbg-color:${r.color}">
               <span class="dbg-btn-dot"></span>
               ${r.label}${badge}
-              <span class="dbg-btn-key">${i + 1}</span>
+              ${key}
               <span class="dbg-btn-odds">${odds}</span>
             </button>
           `;
@@ -168,9 +192,9 @@ export class DebugMenu {
     toggle.title       = 'Debug Menu (`)';
     toggle.textContent = '🔧';
 
-    this._el.appendChild(this._panel);
-    this._el.appendChild(toggle);
-    document.body.appendChild(this._el);
+    root.appendChild(this._panel);
+    root.appendChild(toggle);
+    document.body.appendChild(root);
 
     toggle.addEventListener('click', () => this._togglePanel());
     this._panel.querySelectorAll('.dbg-btn[data-rarity]').forEach(btn => {
@@ -186,7 +210,7 @@ export class DebugMenu {
     document.getElementById('dbg-skip')
       ?.addEventListener('click', () => { this.rollEngine.engine?.cutsceneManager?.stop(); this._toast('Cutscene skipped'); });
     document.getElementById('dbg-clear-fx')
-      ?.addEventListener('click', () => { this.rollEngine.engine?.clearEffects(); this._toast('Effects cleared'); });
+      ?.addEventListener('click', () => { this.rollEngine.engine?.clearEffects?.(); this._toast('Effects cleared'); });
     document.getElementById('dbg-reset')
       ?.addEventListener('click', () => {
         if (confirm('Reset all save data?')) { this.playerState.reset(); this._toast('Save reset'); }
@@ -212,7 +236,6 @@ export class DebugMenu {
     if (this.rollEngine.rolling) return;
     const rarity = RARITIES[rarityId];
     if (!rarity) return;
-
     const item = this.rollEngine.rarityTable.rollItem(rarity);
     this._showPlaying(rarity);
     this.rollEngine.rolling = true;

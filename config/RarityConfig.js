@@ -1,6 +1,6 @@
 // config/RarityConfig.js
 //
-// Weight pool ≈ 1002.35
+// Weight pool ≈ 1002.39  (total / weight = odds)
 // All debugOdds expressed as 1/N strings.
 //
 export const RARITIES = {
@@ -90,12 +90,6 @@ export const RARITIES = {
     bgColor: 'rgba(8,0,18,0.99)',
     textShadow: '0 0 30px rgba(200,80,255,1), 0 0 70px rgba(140,0,255,0.8), 0 0 140px rgba(80,0,200,0.5)',
     cutscene: 'StellarCollapse',
-    effects: {
-      shakeIntensity: 35, particleCount: 130, rayCount: 24, ringCount: 4,
-      glowMaxAlpha: 0.85, riftCount: 6, orbiterCount: 22, debrisCount: 90,
-      wispCount: 10, trailEnabled: true,
-      titleText: 'S T E L L A R   C O L L A P S E', subtitleText: '✦  1 / 2,000  ✦',
-    },
     items: [
       { id: 'neutron_core',     name: 'Neutron Core',     icon: '🌌' },
       { id: 'void_singularity', name: 'Void Singularity', icon: '⚫' },
@@ -104,18 +98,13 @@ export const RARITIES = {
     ],
   },
 
-  // weight 0.2 → 1002.35 / 0.2 ≈ 5,012
+  // weight 0.2 → pool / 0.2 ≈ 5,012
   SUPERNOVA: {
     id: 'SUPERNOVA', label: 'Supernova', weight: 0.2, debugOdds: '1/5,000', badge: '💥',
     color: '#ff6600', glowColor: 'rgba(255,102,0,0.95)', particleColor: '#ffcc00',
     bgColor: 'rgba(12,2,0,0.99)',
-    textShadow: '0 0 30px rgba(255,102,0,1), 0 0 70px rgba(255,0,100,0.9), 0 0 140px rgba(140,0,255,0.6), 0 0 220px rgba(0,150,255,0.3)',
+    textShadow: '0 0 30px rgba(255,102,0,1), 0 0 70px rgba(255,0,100,0.9), 0 0 140px rgba(140,0,255,0.6)',
     cutscene: 'Supernova',
-    effects: {
-      shakeIntensity: 40, particleCount: 160, rayCount: 28, ringCount: 6,
-      glowMaxAlpha: 0.92, debrisCount: 140, wispCount: 12, trailEnabled: true,
-      titleText: 'S U P E R N O V A', subtitleText: '💥  1 / 5,000  💥',
-    },
     items: [
       { id: 'stellar_remnant', name: 'Stellar Remnant', icon: '💥' },
       { id: 'pulsar_shard',    name: 'Pulsar Shard',    icon: '⚡' },
@@ -124,19 +113,13 @@ export const RARITIES = {
     ],
   },
 
-  // weight 0.1 → 1002.35 / 0.1 ≈ 10,024
+  // weight 0.1 → pool / 0.1 ≈ 10,024
   SERAPHIM: {
     id: 'SERAPHIM', label: 'Seraphim', weight: 0.1, debugOdds: '1/10,000', badge: '🔥',
     color: '#ffd700', glowColor: 'rgba(255,215,0,0.98)', particleColor: '#fff5a0',
     bgColor: 'rgba(14,8,0,0.99)',
-    textShadow: '0 0 30px rgba(255,215,0,1), 0 0 70px rgba(255,140,0,0.95), 0 0 140px rgba(255,80,0,0.7), 0 0 240px rgba(255,200,0,0.4)',
+    textShadow: '0 0 30px rgba(255,215,0,1), 0 0 70px rgba(255,140,0,0.95), 0 0 140px rgba(255,80,0,0.7)',
     cutscene: 'Seraphim',
-    effects: {
-      shakeIntensity: 45, particleCount: 180, rayCount: 32, ringCount: 6,
-      glowMaxAlpha: 0.95, crackCount: 7, pillarCount: 5, emberCount: 90,
-      presenceCount: 130, wispCount: 11, windCount: 16, trailEnabled: true,
-      titleText: 'S E R A P H I M', subtitleText: '🔥  1 / 10,000  🔥',
-    },
     items: [
       { id: 'divine_feather', name: 'Divine Feather', icon: '🪶' },
       { id: 'throne_ember',   name: 'Throne Ember',   icon: '🔥' },
@@ -145,31 +128,72 @@ export const RARITIES = {
     ],
   },
 
-  // weight 0.05 → 1002.35 / 0.05 ≈ 20,047
+  // weight 0.05 → pool / 0.05 ≈ 20,048
   CONVERGENCE: {
     id: 'CONVERGENCE', label: 'Convergence', weight: 0.05, debugOdds: '1/20,000', badge: '∞',
-    color: '#ffffff',
-    glowColor: 'rgba(255,255,255,0.98)',
-    particleColor: '#ffffff',
+    color: '#ffffff', glowColor: 'rgba(255,255,255,0.98)', particleColor: '#ffffff',
     bgColor: 'rgba(0,0,0,1)',
-    textShadow: [
-      '0 0 30px rgba(255,255,255,1)',
-      '0 0 70px rgba(255,200,100,0.9)',
-      '0 0 140px rgba(200,100,255,0.8)',
-      '0 0 240px rgba(0,180,255,0.6)',
-      '0 0 360px rgba(255,80,0,0.4)',
-    ].join(', '),
+    textShadow: '0 0 30px rgba(255,255,255,1), 0 0 70px rgba(255,200,100,0.9), 0 0 140px rgba(200,100,255,0.8), 0 0 240px rgba(0,180,255,0.6)',
     cutscene: 'Convergence',
+    items: [
+      { id: 'convergence_echo',    name: 'Convergence Echo',    icon: '∞' },
+      { id: 'prismatic_shard',     name: 'Prismatic Shard',     icon: '🌈' },
+      { id: 'unified_singularity', name: 'Unified Singularity', icon: '⚪' },
+      { id: 'all_memory',          name: 'All Memory',          icon: '💭' },
+    ],
+  },
+
+  // weight 0.04 → pool / 0.04 ≈ 25,060
+  MATRIX: {
+    id: 'MATRIX', label: 'Matrix', weight: 0.04, debugOdds: '1/25,000', badge: '>_',
+    color: '#00ff41', glowColor: 'rgba(0,255,65,0.98)', particleColor: '#00cc33',
+    bgColor: 'rgba(0,4,0,1)',
+    textShadow: [
+      '0 0 10px #00ff41',
+      '0 0 25px #00ff41',
+      '0 0 60px #00cc33',
+      '0 0 130px #008f11',
+    ].join(', '),
+    cutscene: 'Matrix',
     effects: {
-      shakeIntensity: 55, particleCount: 220, rayCount: 40, ringCount: 8,
-      glowMaxAlpha: 1.0, trailEnabled: true,
-      titleText: 'THE CONVERGENCE', subtitleText: '∞  1 / 20,000  ∞',
+      shakeIntensity: 50, particleCount: 200, rayCount: 36, ringCount: 7,
+      glowMaxAlpha: 0.9, rainColumns: 50, cascadeStreams: 90, debrisParticles: 120,
+      trailEnabled: true,
+      titleText:   'MATRIX',
+      subtitleText: '> 1 / 25,000  [SYSTEM BREACH]',
     },
     items: [
-      { id: 'convergence_echo',   name: 'Convergence Echo',   icon: '∞' },
-      { id: 'prismatic_shard',    name: 'Prismatic Shard',    icon: '🌈' },
-      { id: 'unified_singularity',name: 'Unified Singularity',icon: '⚪' },
-      { id: 'all_memory',         name: 'All Memory',         icon: '💭' },
+      { id: 'source_code',  name: 'Source Code',  icon: '</>' },
+      { id: 'red_pill',     name: 'Red Pill',     icon: '💊' },
+      { id: 'ghost_signal', name: 'Ghost Signal', icon: '📡' },
+      { id: 'null_key',     name: 'Null Key',     icon: '🔑' },
+    ],
+  },
+
+  // weight 0.02 → pool / 0.02 ≈ 50,120
+  ELDRITCH: {
+    id: 'ELDRITCH', label: 'Eldritch', weight: 0.02, debugOdds: '1/50,000', badge: '👁',
+    color: '#c084fc', glowColor: 'rgba(139,43,226,0.98)', particleColor: '#8b2be2',
+    bgColor: 'rgba(2,0,10,1)',
+    textShadow: [
+      '0 0 12px #c084fc',
+      '0 0 30px #8b2be2',
+      '0 0 70px #4b0082',
+      '0 0 150px rgba(139,43,226,0.6)',
+      '0 0 280px rgba(75,0,130,0.3)',
+    ].join(', '),
+    cutscene: 'Eldritch',
+    effects: {
+      shakeIntensity: 60, particleCount: 240, rayCount: 44, ringCount: 9,
+      glowMaxAlpha: 0.95, crackCount: 7, tentacleCount: 12, madnessCount: 80,
+      whisperCount: 12, distortCount: 6, runeCount: 8, auraCount: 6,
+      trailEnabled: true,
+    },
+    items: [
+      { id: 'eye_of_void',     name: 'Eye of the Void',  icon: '👁' },
+      { id: 'elder_rune',      name: 'Elder Rune',       icon: 'ᚠ' },
+      { id: 'sanity_fragment', name: 'Sanity Fragment',  icon: '🔮' },
+      { id: 'forbidden_tome',  name: 'Forbidden Tome',   icon: '📕' },
     ],
   },
 
@@ -178,7 +202,7 @@ export const RARITIES = {
 // Ordered most common → rarest
 export const RARITY_ORDER = [
   'COMMON', 'UNCOMMON', 'RARE', 'EPIC', 'LEGENDARY',
-  'MYTHIC', 'DIVINE', 'SUPERNOVA', 'SERAPHIM', 'CONVERGENCE',
+  'MYTHIC', 'DIVINE', 'SUPERNOVA', 'SERAPHIM', 'CONVERGENCE', 'MATRIX', 'ELDRITCH',
 ];
 
 export function getRarityByWeight(roll) {
