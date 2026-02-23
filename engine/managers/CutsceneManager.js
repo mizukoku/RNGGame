@@ -10,6 +10,8 @@ import { Seraphim }       from '../../cutscenes/Seraphim.js';
 import { Convergence }    from '../../cutscenes/Convergence.js';
 import { Matrix }         from '../../cutscenes/Matrix.js';
 import { Eldritch }       from '../../cutscenes/Eldritch.js';
+import { TimeCollapse }   from '../../cutscenes/Timecollapse.js';
+import { PixelGenesis }   from '../../cutscenes/PixelGenesis.js';
 
 const SCENE_MAP = {
   NormalScene,
@@ -23,6 +25,8 @@ const SCENE_MAP = {
   Convergence,
   Matrix,
   Eldritch,
+  TimeCollapse,
+  PixelGenesis,
 };
 
 export class CutsceneManager {

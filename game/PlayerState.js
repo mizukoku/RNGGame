@@ -7,7 +7,7 @@ export class PlayerState {
     this.totalRolls     = 0;
     this.rollsSinceLast = {
       LEGENDARY: 0, MYTHIC: 0, DIVINE: 0,
-      SUPERNOVA: 0, SERAPHIM: 0, CONVERGENCE: 0, MATRIX: 0, ELDRITCH: 0,
+      SUPERNOVA: 0, SERAPHIM: 0, CONVERGENCE: 0, MATRIX: 0, ELDRITCH: 0, TIMECOLLAPSE: 0, PIXELGENESIS: 0,
     };
     this.inventory    = {};
     this.rarityStats  = {};
@@ -75,7 +75,7 @@ export class PlayerState {
     this.totalRolls     = 0;
     this.rollsSinceLast = {
       LEGENDARY: 0, MYTHIC: 0, DIVINE: 0,
-      SUPERNOVA: 0, SERAPHIM: 0, CONVERGENCE: 0, MATRIX: 0, ELDRITCH: 0,
+      SUPERNOVA: 0, SERAPHIM: 0, CONVERGENCE: 0, MATRIX: 0, ELDRITCH: 0, TIMECOLLAPSE: 0, PIXELGENESIS: 0,
     };
     this.inventory    = {};
     this.rarityStats  = {};

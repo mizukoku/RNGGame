@@ -143,6 +143,26 @@ export const RECIPES = [
     category: 'eldritch',
   },
 
+
+  // ── TIER 13 — Time Collapse ──────────────────────────────────
+  {
+    id: 'paradox_engine', name: 'Paradox Engine', icon: '⧗',
+    desc: 'A device that runs forward by going backwards. Fate accelerates.',
+    ingredients: [{ rarityId: 'TIMECOLLAPSE', count: 1 }],
+    buff: { name: 'Paradox Engine', icon: '⧗', multiplier: 45.0, rolls: 7, color: '#64c8ff' },
+    category: 'timecollapse',
+  },
+
+
+  // ── TIER 14 — 8-Bit Genesis ──────────────────────────────────
+  {
+    id: 'golden_run', name: 'Golden Run', icon: '★',
+    desc: 'Three lives. Infinite stars. Luck beyond the final world.',
+    ingredients: [{ rarityId: 'PIXELGENESIS', count: 1 }],
+    buff: { name: 'Golden Run', icon: '★', multiplier: 60.0, rolls: 6, color: '#fcbc3c' },
+    category: 'pixelgenesis',
+  },
+
   // ── SYNERGY recipes ────────────────────────────────────────────
   {
     id: 'cosmic_brew', name: 'Cosmic Brew', icon: '🌌',
@@ -170,6 +190,24 @@ export const RECIPES = [
     desc: 'All paths converge. Roll as if you are already chosen.',
     ingredients: [{ rarityId: 'EPIC', count: 1 }, { rarityId: 'LEGENDARY', count: 1 }],
     buff: { name: 'Nexus Crown', icon: '👑', multiplier: 4.0, rolls: 35, color: '#fde68a' },
+    category: 'synergy',
+  },
+
+
+
+  {
+    id: 'timeless_pixel', name: 'Timeless Pixel', icon: '⭐',
+    desc: 'Time collapsed into a single 8-bit frame. Reality has no power here.',
+    ingredients: [{ rarityId: 'TIMECOLLAPSE', count: 1 }, { rarityId: 'PIXELGENESIS', count: 1 }],
+    buff: { name: 'Timeless Pixel', icon: '⭐', multiplier: 75.0, rolls: 5, color: '#fcbc3c' },
+    category: 'synergy',
+  },
+
+  {
+    id: 'temporal_eye', name: 'Temporal Eye', icon: '⏱',
+    desc: 'Eldritch sight through collapsing time. Nothing is hidden.',
+    ingredients: [{ rarityId: 'ELDRITCH', count: 1 }, { rarityId: 'TIMECOLLAPSE', count: 1 }],
+    buff: { name: 'Temporal Eye', icon: '⏱', multiplier: 55.0, rolls: 5, color: '#64c8ff' },
     category: 'synergy',
   },
 
@@ -202,6 +240,8 @@ export const CATEGORIES = [
   { id: 'seraphim',    label: 'Seraphim',    color: '#ffd700' },
   { id: 'convergence', label: 'Convergence', color: '#ffffff' },
   { id: 'matrix',      label: '>_ Matrix',   color: '#00ff41' },
+  { id: 'pixelgenesis', label: '★ 8-Bit Genesis', color: '#fcbc3c' },
+  { id: 'timecollapse', label: '⧗ Time Collapse', color: '#64c8ff' },
   { id: 'eldritch', label: '👁 Eldritch', color: '#c084fc' },
   { id: 'synergy',     label: '✦ Synergy',   color: '#a78bfa' },
 ];

@@ -197,12 +197,63 @@ export const RARITIES = {
     ],
   },
 
+  // weight 0.01337 → pool / 0.01337 ≈ 75,000
+  TIMECOLLAPSE: {
+    id: 'TIMECOLLAPSE', label: 'Time Collapse', weight: 0.01337, debugOdds: '1/75,000', badge: '⧗',
+    color: '#64c8ff', glowColor: 'rgba(100,200,255,0.98)', particleColor: '#a8d8ff',
+    bgColor: 'rgba(0,4,14,1)',
+    textShadow: [
+      '0 0 12px #64c8ff',
+      '0 0 30px #64c8ff',
+      '0 0 70px #ffd700',
+      '0 0 150px rgba(100,200,255,0.6)',
+      '0 0 280px rgba(255,215,0,0.3)',
+    ].join(', '),
+    cutscene: 'TimeCollapse',
+    effects: {
+      shakeIntensity: 65, particleCount: 250, rayCount: 48, ringCount: 10,
+      glowMaxAlpha: 0.95, echoCount: 40, shardCount: 65, fractureCount: 12,
+      streamCount: 32, sandGrains: 40, auraCount: 7, trailEnabled: true,
+    },
+    items: [
+      { id: 'broken_hourglass', name: 'Broken Hourglass',  icon: '⧗' },
+      { id: 'paradox_shard',   name: 'Paradox Shard',     icon: '🔷' },
+      { id: 'lost_second',     name: 'Lost Second',        icon: '⏱' },
+      { id: 'eternal_moment',  name: 'Eternal Moment',     icon: '∞' },
+    ],
+  },
+
+  // weight 0.01002 → pool / 0.01002 ≈ 100,000
+  PIXELGENESIS: {
+    id: 'PIXELGENESIS', label: '8-Bit Genesis', weight: 0.01002, debugOdds: '1/100,000', badge: '★',
+    color: '#fcbc3c', glowColor: 'rgba(252,188,60,0.98)', particleColor: '#f8f8f8',
+    bgColor: 'rgba(8,8,8,1)',
+    textShadow: [
+      '3px 3px 0 #080808',
+      '0 0 14px #fcbc3c',
+      '0 0 35px #fcbc3c',
+      '0 0 80px rgba(252,188,60,0.7)',
+      '0 0 180px rgba(252,188,60,0.3)',
+    ].join(', '),
+    cutscene: 'PixelGenesis',
+    effects: {
+      shakeIntensity: 55, particleCount: 220, rayCount: 40,
+      glowMaxAlpha: 0.85, auraCount: 7, trailEnabled: true,
+    },
+    items: [
+      { id: '1up_token',      name: '1-UP Token',       icon: '★' },
+      { id: 'power_star',     name: 'Power Star',       icon: '⭐' },
+      { id: 'golden_coin',    name: 'Golden Coin',      icon: '🪙' },
+      { id: 'mystery_block',  name: 'Mystery Block',    icon: '?' },
+    ],
+  },
+
 };
 
 // Ordered most common → rarest
 export const RARITY_ORDER = [
   'COMMON', 'UNCOMMON', 'RARE', 'EPIC', 'LEGENDARY',
-  'MYTHIC', 'DIVINE', 'SUPERNOVA', 'SERAPHIM', 'CONVERGENCE', 'MATRIX', 'ELDRITCH',
+  'MYTHIC', 'DIVINE', 'SUPERNOVA', 'SERAPHIM', 'CONVERGENCE', 'MATRIX', 'ELDRITCH', 'TIMECOLLAPSE', 'PIXELGENESIS',
 ];
 
 export function getRarityByWeight(roll) {

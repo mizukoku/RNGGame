@@ -98,6 +98,42 @@ const DEBUG_CSS = `
   0%,100%{transform:scale(1);box-shadow:0 0 8px #c084fc}
   50%    {transform:scale(1.5);box-shadow:0 0 16px #8b2be2,0 0 30px rgba(139,43,226,.5)}
 }
+
+/* TimeCollapse row — temporal cyan + clock feel */
+.dbg-btn[data-rarity="TIMECOLLAPSE"] {
+  font-family:'Times New Roman',serif;font-style:italic;
+  background:linear-gradient(90deg,rgba(100,200,255,.07) 0%,transparent 100%);
+}
+.dbg-btn[data-rarity="TIMECOLLAPSE"]:hover {
+  background:linear-gradient(90deg,rgba(100,200,255,.15) 0%,rgba(255,215,0,.05) 100%);
+}
+.dbg-btn[data-rarity="TIMECOLLAPSE"] .dbg-btn-dot {
+  animation:tcDotSpin 2s linear infinite;
+}
+@keyframes tcDotSpin {
+  0%  {box-shadow:0 0 8px #64c8ff;transform:scale(1)}
+  50% {box-shadow:0 0 16px #ffd700,0 0 30px rgba(100,200,255,.5);transform:scale(1.4)}
+  100%{box-shadow:0 0 8px #64c8ff;transform:scale(1)}
+}
+
+/* 8-Bit Genesis row — retro pixel terminal feel */
+.dbg-btn[data-rarity="PIXELGENESIS"] {
+  font-family:'Courier New',monospace;font-weight:700;text-transform:uppercase;
+  image-rendering:pixelated;
+  background:linear-gradient(90deg,rgba(252,188,60,.1) 0%,transparent 100%);
+}
+.dbg-btn[data-rarity="PIXELGENESIS"]:hover {
+  background:linear-gradient(90deg,rgba(252,188,60,.22) 0%,rgba(228,0,88,.05) 100%);
+}
+.dbg-btn[data-rarity="PIXELGENESIS"] .dbg-btn-dot {
+  animation:pgDotBlink .5s step-end infinite;
+}
+@keyframes pgDotBlink {
+  0%  {box-shadow:0 0 10px #fcbc3c;background:#fcbc3c}
+  33% {box-shadow:0 0 10px #e40058;background:#e40058}
+  66% {box-shadow:0 0 10px #3c78f0;background:#3c78f0}
+  100%{box-shadow:0 0 10px #fcbc3c;background:#fcbc3c}
+}
 .dbg-util-btn{
   width:calc(100% - 28px);margin:4px 14px;padding:6px 10px;
   background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
