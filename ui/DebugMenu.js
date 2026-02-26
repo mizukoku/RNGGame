@@ -45,6 +45,30 @@ const DEBUG_CSS = `
 .dbg-section{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}
 .dbg-section:last-child{border-bottom:none}
 .dbg-section-title{font-size:.58rem;font-weight:700;letter-spacing:.25em;color:rgba(255,255,255,.2);padding:0 14px 6px;text-transform:uppercase}
+
+/* ── Scrollable cutscene button list ── */
+.dbg-scene-scroll {
+  max-height:310px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,.12) transparent;
+  position:relative;
+}
+.dbg-scene-scroll::-webkit-scrollbar { width:4px; }
+.dbg-scene-scroll::-webkit-scrollbar-track { background:transparent; }
+.dbg-scene-scroll::-webkit-scrollbar-thumb {
+  background:rgba(255,255,255,.12);border-radius:2px;
+}
+.dbg-scene-scroll::-webkit-scrollbar-thumb:hover {
+  background:rgba(255,255,255,.22);
+}
+/* Bottom fade mask — hints there is more content below */
+.dbg-scene-fade {
+  position:sticky;bottom:0;left:0;right:0;height:28px;
+  background:linear-gradient(to bottom,transparent,rgba(8,8,14,.97));
+  pointer-events:none;margin-top:-28px;
+}
 .dbg-btn{
   display:flex;align-items:center;gap:9px;width:100%;padding:7px 14px;
   background:none;border:none;cursor:pointer;
@@ -134,6 +158,89 @@ const DEBUG_CSS = `
   66% {box-shadow:0 0 10px #3c78f0;background:#3c78f0}
   100%{box-shadow:0 0 10px #fcbc3c;background:#fcbc3c}
 }
+
+/* Void Awakens row — deep violet singularity pulse */
+.dbg-btn[data-rarity="VOIDAWAKENS"] {
+  font-family:'Georgia',serif;font-style:italic;
+  background:linear-gradient(90deg,rgba(144,96,255,.08) 0%,transparent 100%);
+}
+.dbg-btn[data-rarity="VOIDAWAKENS"]:hover {
+  background:linear-gradient(90deg,rgba(144,96,255,.18) 0%,rgba(64,200,255,.05) 100%);
+}
+.dbg-btn[data-rarity="VOIDAWAKENS"] .dbg-btn-dot {
+  animation:vaDotPulse 1.4s ease-in-out infinite;
+}
+@keyframes vaDotPulse {
+  0%,100%{
+    box-shadow:0 0 6px #9060ff;
+    background:#9060ff;
+    transform:scale(1);
+  }
+  35%{
+    box-shadow:0 0 16px #c8a8ff, 0 0 32px rgba(144,96,255,.5);
+    background:#c8a8ff;
+    transform:scale(1.5);
+  }
+  65%{
+    box-shadow:0 0 12px #40c8ff, 0 0 24px rgba(64,200,255,.4);
+    background:#40c8ff;
+    transform:scale(1.25);
+  }
+}
+
+  30%    {box-shadow:0 0 22px #fffbe8,0 0 44px rgba(255,216,110,.7);background:#fffbe8;transform:scale(1.5)}
+  60%    {box-shadow:0 0 14px #80c8ff;background:#b8e4ff;transform:scale(1.2)}
+}
+
+/* Sacred Blade row — golden medieval */
+.dbg-btn[data-rarity="SACREDBLADE"] {
+  font-family:'Times New Roman',serif;font-style:italic;font-weight:700;
+  background:linear-gradient(90deg,rgba(255,215,0,.1) 0%,transparent 100%);
+}
+.dbg-btn[data-rarity="SACREDBLADE"]:hover {
+  background:linear-gradient(90deg,rgba(255,215,0,.22) 0%,rgba(255,244,176,.06) 100%);
+}
+.dbg-btn[data-rarity="SACREDBLADE"] .dbg-btn-dot {
+  animation:sbDotPulse 1.2s ease-in-out infinite alternate;
+}
+@keyframes sbDotPulse {
+  from{box-shadow:0 0 8px #ffd700;background:#ffd700;transform:scale(1)}
+  to  {box-shadow:0 0 20px #ffd700,0 0 45px rgba(255,215,0,.4);background:#fffef0;transform:scale(1.5)}
+}
+
+/* The Observer row — deep purple, unsettling */
+.dbg-btn[data-rarity="THEOBSERVER"] {
+  font-family:'Georgia','Times New Roman',serif;font-style:italic;
+  background:linear-gradient(90deg,rgba(100,0,180,.12) 0%,transparent 100%);
+}
+.dbg-btn[data-rarity="THEOBSERVER"]:hover {
+  background:linear-gradient(90deg,rgba(120,0,200,.2) 0%,rgba(80,0,140,.06) 100%);
+}
+.dbg-btn[data-rarity="THEOBSERVER"] .dbg-btn-dot {
+  animation:toDebugDot 2.8s ease-in-out infinite alternate;
+}
+@keyframes toDebugDot {
+  from{box-shadow:0 0 5px #6600aa;background:#6600aa;transform:scale(1)}
+  to  {box-shadow:0 0 18px #9933cc,0 0 40px rgba(100,0,180,.4);background:#c8a8ff;transform:scale(1.4)}
+}
+
+/* The Fractal row — electric teal, monospace */
+.dbg-btn[data-rarity="THEFRACTAL"] {
+  font-family:'Courier New',monospace;font-weight:700;
+  background:linear-gradient(90deg,rgba(0,255,204,.1) 0%,transparent 100%);
+}
+.dbg-btn[data-rarity="THEFRACTAL"]:hover {
+  background:linear-gradient(90deg,rgba(0,255,204,.2) 0%,rgba(0,63,255,.06) 100%);
+}
+.dbg-btn[data-rarity="THEFRACTAL"] .dbg-btn-dot {
+  animation:tfDebugDot 1.6s linear infinite;
+}
+@keyframes tfDebugDot {
+  0%  {box-shadow:0 0 6px #00ffcc;background:#00ffcc;transform:scale(1)}
+  33% {box-shadow:0 0 14px #ff00cc,0 0 30px rgba(255,0,204,.4);background:#ff00cc;transform:scale(1.4)}
+  66% {box-shadow:0 0 14px #003fff,0 0 30px rgba(0,63,255,.4);background:#003fff;transform:scale(1.2)}
+  100%{box-shadow:0 0 6px #00ffcc;background:#00ffcc;transform:scale(1)}
+}
 .dbg-util-btn{
   width:calc(100% - 28px);margin:4px 14px;padding:6px 10px;
   background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
@@ -192,20 +299,23 @@ export class DebugMenu {
 
       <div class="dbg-section">
         <div class="dbg-section-title">Fire Cutscene</div>
-        ${DISPLAY_ORDER.map((id, i) => {
-          const r     = RARITIES[id];
-          const odds  = getOddsLabel(r);
-          const badge = r.badge ? `<span class="dbg-btn-badge">${r.badge}</span>` : '';
-          const key   = i < 9 ? `<span class="dbg-btn-key">${i + 1}</span>` : '';
-          return `
-            <button class="dbg-btn" data-rarity="${id}" style="--dbg-color:${r.color}">
-              <span class="dbg-btn-dot"></span>
-              ${r.label}${badge}
-              ${key}
-              <span class="dbg-btn-odds">${odds}</span>
-            </button>
-          `;
-        }).join('')}
+        <div class="dbg-scene-scroll">
+          ${DISPLAY_ORDER.map((id, i) => {
+            const r     = RARITIES[id];
+            const odds  = getOddsLabel(r);
+            const badge = r.badge ? `<span class="dbg-btn-badge">${r.badge}</span>` : '';
+            const key   = i < 9 ? `<span class="dbg-btn-key">${i + 1}</span>` : '';
+            return `
+              <button class="dbg-btn" data-rarity="${id}" style="--dbg-color:${r.color}">
+                <span class="dbg-btn-dot"></span>
+                ${r.label}${badge}
+                ${key}
+                <span class="dbg-btn-odds">${odds}</span>
+              </button>
+            `;
+          }).join('')}
+          <div class="dbg-scene-fade"></div>
+        </div>
       </div>
 
       <div class="dbg-section">

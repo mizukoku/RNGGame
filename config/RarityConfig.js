@@ -248,12 +248,94 @@ export const RARITIES = {
     ],
   },
 
+  // weight 0.00802 → pool / 0.00802 ≈ 125,000
+  VOIDAWAKENS: {
+    id: 'VOIDAWAKENS', label: 'Void Awakens', weight: 0.00802, debugOdds: '1/125,000', badge: '◉',
+    color: '#c8a8ff', glowColor: 'rgba(200,168,255,0.98)', particleColor: '#f0e8ff',
+    bgColor: 'rgba(0,0,8,1)',
+    textShadow: [
+      '0 0 10px #9060ff',
+      '0 0 26px #9060ff',
+      '0 0 60px rgba(144,96,255,0.8)',
+      '0 0 140px rgba(144,96,255,0.5)',
+      '0 0 280px rgba(64,200,255,0.25)',
+    ].join(', '),
+    cutscene: 'VoidAwakens',
+    effects: {
+      shakeIntensity: 72, particleCount: 270, rayCount: 52,
+      glowMaxAlpha: 0.96, auraCount: 8, trailEnabled: true,
+      tendrilCount: 24, shardCount: 90, starCount: 120, symbolCount: 10,
+    },
+    items: [
+      { id: 'singularity_shard',  name: 'Singularity Shard',  icon: '◉' },
+      { id: 'void_essence',       name: 'Void Essence',       icon: '⊗' },
+      { id: 'newborn_star',       name: 'Newborn Star',       icon: '✦' },
+      { id: 'reality_crack',      name: 'Reality Crack',      icon: '⊘' },
+    ],
+  },
+
+  // weight 0.00668 → pool / 0.00668 ≈ 150,000
+  SACREDBLADE: {
+    id: 'SACREDBLADE', label: 'Sacred Blade', weight: 0.00668, debugOdds: '1/150,000', badge: '⚔',
+    color: '#ffd700', glowColor: 'rgba(255,215,0,0.99)', particleColor: '#fffef0',
+    bgColor: 'rgba(12,8,0,1)',
+    textShadow: '2px 2px 0 #0c0800, 0 0 10px #ffd700, 0 0 28px #ffd700, 0 0 70px rgba(255,215,0,0.8), 0 0 160px rgba(255,215,0,0.4)',
+    cutscene: 'SacredBlade',
+    effects: {
+      shakeIntensity: 70, particleCount: 260, rayCount: 52,
+      glowMaxAlpha: 0.98, auraCount: 8, trailEnabled: true,
+    },
+    items: [
+      { id: 'holy_shard',     name: 'Holy Shard',       icon: '⚔' },
+      { id: 'divine_sigil',   name: 'Divine Sigil',     icon: '✦' },
+      { id: 'sacred_crystal', name: 'Sacred Crystal',   icon: '💎' },
+      { id: 'worthy_mark',    name: 'Mark of the Worthy', icon: '👑' },
+    ],
+  },
+
+  // weight 0.005012 → pool / 0.005012 ≈ 200,000
+  THEOBSERVER: {
+    id: 'THEOBSERVER', label: 'The Observer', weight: 0.005012, debugOdds: '1/200,000', badge: '👁',
+    color: '#9933cc', glowColor: 'rgba(100,0,180,0.99)', particleColor: '#c8a8ff',
+    bgColor: 'rgba(2,0,6,1)',
+    textShadow: '0 0 10px rgba(160,80,255,.7), 0 0 28px rgba(120,40,200,.5), 0 0 70px rgba(100,0,180,.35), 0 0 150px rgba(80,0,150,.2)',
+    cutscene: 'TheObserver',
+    effects: {
+      glowMaxAlpha: 0.72,
+    },
+    items: [
+      { id: 'watchers_eye',  name: "Watcher's Eye",  icon: '👁' },
+      { id: 'void_iris',     name: 'Void Iris',       icon: '◉' },
+      { id: 'silent_mark',   name: 'Silent Mark',     icon: '✦' },
+      { id: 'witnessed_shard', name: 'Witnessed Shard', icon: '💜' },
+    ],
+  },
+
+  // weight 0.003341 → pool / 0.003341 ≈ 300,000
+  THEFRACTAL: {
+    id: 'THEFRACTAL', label: 'The Fractal', weight: 0.003341, debugOdds: '1/300,000', badge: '◈',
+    color: '#00ffcc', glowColor: 'rgba(0,255,204,0.99)', particleColor: '#ffffff',
+    bgColor: 'rgba(0,5,10,1)',
+    textShadow: '0 0 8px #00ffcc, 0 0 22px #00ffcc, 0 0 60px rgba(0,255,204,.6), 0 0 140px rgba(0,255,204,.3)',
+    cutscene: 'TheFractal',
+    effects: {
+      shakeIntensity: 80, particleCount: 280, rayCount: 60,
+      glowMaxAlpha: 0.92, auraCount: 8, trailEnabled: true,
+    },
+    items: [
+      { id: 'prime_equation',  name: 'Prime Equation',    icon: '◈' },
+      { id: 'fractal_shard',   name: 'Fractal Shard',      icon: '💎' },
+      { id: 'golden_ratio',    name: 'Golden Ratio',        icon: 'φ' },
+      { id: 'void_formula',    name: 'Void Formula',        icon: '∞' },
+    ],
+  },
+
 };
 
 // Ordered most common → rarest
 export const RARITY_ORDER = [
   'COMMON', 'UNCOMMON', 'RARE', 'EPIC', 'LEGENDARY',
-  'MYTHIC', 'DIVINE', 'SUPERNOVA', 'SERAPHIM', 'CONVERGENCE', 'MATRIX', 'ELDRITCH', 'TIMECOLLAPSE', 'PIXELGENESIS',
+  'MYTHIC', 'DIVINE', 'SUPERNOVA', 'SERAPHIM', 'CONVERGENCE', 'MATRIX', 'ELDRITCH', 'TIMECOLLAPSE', 'PIXELGENESIS', 'VOIDAWAKENS', 'SACREDBLADE', 'THEOBSERVER', 'THEFRACTAL',
 ];
 
 export function getRarityByWeight(roll) {

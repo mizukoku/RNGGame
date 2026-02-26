@@ -10,8 +10,12 @@ import { Seraphim }       from '../../cutscenes/Seraphim.js';
 import { Convergence }    from '../../cutscenes/Convergence.js';
 import { Matrix }         from '../../cutscenes/Matrix.js';
 import { Eldritch }       from '../../cutscenes/Eldritch.js';
-import { TimeCollapse }   from '../../cutscenes/Timecollapse.js';
+import { TimeCollapse }   from '../../cutscenes/TimeCollapse.js';
 import { PixelGenesis }   from '../../cutscenes/PixelGenesis.js';
+import { VoidAwakens }    from '../../cutscenes/VoidAwakens.js';
+import { SacredBlade }    from '../../cutscenes/SacredBlade.js';
+import { TheObserver }    from '../../cutscenes/TheObserver.js';
+import { TheFractal }     from '../../cutscenes/TheFractal.js';
 
 const SCENE_MAP = {
   NormalScene,
@@ -27,6 +31,10 @@ const SCENE_MAP = {
   Eldritch,
   TimeCollapse,
   PixelGenesis,
+  VoidAwakens,
+  SacredBlade,
+  TheObserver,
+  TheFractal,
 };
 
 export class CutsceneManager {
