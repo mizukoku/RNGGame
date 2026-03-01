@@ -6,38 +6,37 @@
 //
 export const RECIPES = [
 
-
-  // ── TIER 15 — Sacred Blade ───────────────────────────────────
   {
-    id: 'blades_blessing', name: "Blade's Blessing", icon: '⚔',
-    desc: 'The worthy receive fivefold fortune. Even fate bends to the holy edge.',
-    ingredients: [{ rarityId: 'SACREDBLADE', count: 1 }],
-    buff: { name: "Blade's Blessing", icon: '⚔', multiplier: 100.0, rolls: 6, color: '#ffd700' },
-    category: 'sacredblade',
+    id: 'dreaming_rebirth', name: 'Dreaming Rebirth', icon: '◎',
+    desc: 'To dream is one thing. To be reborn within the dream — that is another.',
+    ingredients: [{ rarityId: 'THEENDLESSDREAM', count: 1 }, { rarityId: 'REBIRTH', count: 1 }],
+    buff: { name: 'Dreaming Rebirth', icon: '◎', multiplier: 750.0, rolls: 7, color: '#ffd080' },
+    category: 'synergy',
   },
 
-
-  // ── TIER 16 — The Observer ───────────────────────────────────
   {
-    id: 'watchers_blessing', name: "Watcher's Blessing", icon: '👁',
-    desc: 'To be seen by the Observer is to be known completely. Fortune cannot hide.',
-    ingredients: [{ rarityId: 'THEOBSERVER', count: 1 }],
-    buff: { name: "Watcher's Blessing", icon: '👁', multiplier: 140.0, rolls: 6, color: '#9933cc' },
-    category: 'theobserver',
+    id: 'dreaming_nation', name: 'Dreaming Nation', icon: '◌',
+    desc: 'A people united — even in the dream. Especially in the dream.',
+    ingredients: [{ rarityId: 'THENATION', count: 1 }, { rarityId: 'THEENDLESSDREAM', count: 1 }],
+    buff: { name: 'Dreaming Nation', icon: '◌', multiplier: 580.0, rolls: 6, color: '#c8a0ff' },
+    category: 'synergy',
   },
 
-
-  // ── TIER 17 — The Fractal ───────────────────────────────────
   {
-    id: 'prime_solution', name: 'Prime Solution', icon: '◈',
-    desc: 'The equation solved. Reality bends to the formula.',
-    ingredients: [{ rarityId: 'THEFRACTAL', count: 1 }],
-    buff: { name: 'Prime Solution', icon: '◈', multiplier: 200.0, rolls: 6, color: '#00ffcc' },
-    category: 'thefractal',
+    id: 'light_of_the_nation', name: 'Light of the Nation', icon: '♔',
+    desc: 'The last light of the universe — and it shines for the people.',
+    ingredients: [{ rarityId: 'THELASTLIGHT', count: 1 }, { rarityId: 'THENATION', count: 1 }],
+    buff: { name: 'Light of the Nation', icon: '♔', multiplier: 450.0, rolls: 6, color: '#ffd700' },
+    category: 'synergy',
   },
 
-  // ── SYNERGY recipes ────────────────────────────────────────────
-
+  {
+    id: 'fractal_in_darkness', name: 'Fractal in Darkness', icon: '◎',
+    desc: 'The equation persists after the last light fades. Mathematics outlives entropy.',
+    ingredients: [{ rarityId: 'THEFRACTAL', count: 1 }, { rarityId: 'THELASTLIGHT', count: 1 }],
+    buff: { name: 'Fractal in Darkness', icon: '◎', multiplier: 350.0, rolls: 5, color: '#ff9933' },
+    category: 'synergy',
+  },
 
   {
     id: 'eye_of_the_equation', name: 'Eye of the Equation', icon: '◉',
@@ -158,6 +157,11 @@ export const CATEGORIES = [
   { id: 'seraphim',    label: 'Seraphim',    color: '#ffd700' },
   { id: 'convergence', label: 'Convergence', color: '#ffffff' },
   { id: 'matrix',      label: '>_ Matrix',   color: '#00ff41' },
+  { id: 'thegoldenhour', label: '☀ The Golden Hour', color: '#ffb347' },
+  { id: 'rebirth', label: '✦ Rebirth', color: '#ffd080' },
+  { id: 'theendlessdream', label: '∿ The Endless Dream', color: '#c8a0ff' },
+  { id: 'thenation', label: '♛ The Nation', color: '#ffd700' },
+  { id: 'thelastlight', label: '🕯 The Last Light', color: '#ff9933' },
   { id: 'thefractal', label: '◈ The Fractal', color: '#00ffcc' },
   { id: 'theobserver', label: '👁 The Observer', color: '#9933cc' },
   { id: 'sacredblade', label: '⚔ Sacred Blade', color: '#ffd700' },

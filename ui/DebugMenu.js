@@ -241,6 +241,88 @@ const DEBUG_CSS = `
   66% {box-shadow:0 0 14px #003fff,0 0 30px rgba(0,63,255,.4);background:#003fff;transform:scale(1.2)}
   100%{box-shadow:0 0 6px #00ffcc;background:#00ffcc;transform:scale(1)}
 }
+
+/* The Last Light row — ember orange, serif */
+.dbg-btn[data-rarity="THELASTLIGHT"] {
+  font-family:'Georgia','Times New Roman',serif;
+  background:linear-gradient(90deg,rgba(255,80,0,.1) 0%,transparent 100%);
+}
+.dbg-btn[data-rarity="THELASTLIGHT"]:hover {
+  background:linear-gradient(90deg,rgba(255,100,0,.2) 0%,rgba(255,40,0,.05) 100%);
+}
+.dbg-btn[data-rarity="THELASTLIGHT"] .dbg-btn-dot {
+  animation:llDebugDot 3.4s ease-in-out infinite alternate;
+}
+@keyframes llDebugDot {
+  0%  {box-shadow:0 0 8px #fff8f0;background:#fff8f0;transform:scale(1.3)}
+  40% {box-shadow:0 0 10px #ff9933,0 0 22px rgba(255,153,51,.5);background:#ff9933;transform:scale(1.1)}
+  75% {box-shadow:0 0 8px #ff4400,0 0 18px rgba(255,68,0,.4);background:#ff4400;transform:scale(0.9)}
+  100%{box-shadow:0 0 4px #1a0800;background:#331000;transform:scale(0.7)}
+}
+
+/* The Nation row — gold/crimson, serif, stately */
+.dbg-btn[data-rarity="THENATION"] {
+  font-family:'Georgia','Times New Roman',serif;font-weight:600;
+  background:linear-gradient(90deg,rgba(255,215,0,.1) 0%,rgba(204,0,32,.05) 60%,transparent 100%);
+}
+.dbg-btn[data-rarity="THENATION"]:hover {
+  background:linear-gradient(90deg,rgba(255,215,0,.2) 0%,rgba(204,0,32,.1) 60%,transparent 100%);
+}
+.dbg-btn[data-rarity="THENATION"] .dbg-btn-dot {
+  animation:tnDebugDot 2s ease-in-out infinite alternate;
+}
+@keyframes tnDebugDot {
+  0%  {background:#cc0020;box-shadow:0 0 6px #cc0020;transform:scale(0.9)}
+  50% {background:#ffd700;box-shadow:0 0 12px #ffd700,0 0 28px rgba(255,215,0,.5);transform:scale(1.3)}
+  100%{background:#ffffff;box-shadow:0 0 18px #fff,0 0 40px rgba(255,215,0,.6);transform:scale(1.1)}
+}
+
+/* The Endless Dream row — soft lavender, dreamy drift */
+.dbg-btn[data-rarity="THEENDLESSDREAM"] {
+  font-family:'Georgia','Times New Roman',serif;font-style:italic;
+  background:linear-gradient(90deg,rgba(153,102,255,.1) 0%,rgba(255,136,204,.05) 60%,transparent 100%);
+}
+.dbg-btn[data-rarity="THEENDLESSDREAM"]:hover {
+  background:linear-gradient(90deg,rgba(200,160,255,.2) 0%,rgba(255,136,204,.08) 60%,transparent 100%);
+}
+.dbg-btn[data-rarity="THEENDLESSDREAM"] .dbg-btn-dot {
+  animation:edDebugDot 4.5s ease-in-out infinite;
+}
+@keyframes edDebugDot {
+  0%  {background:#c8a0ff;box-shadow:0 0 5px #c8a0ff;transform:scale(1) translateY(0)}
+  25% {background:#ff88cc;box-shadow:0 0 12px #ff88cc,0 0 26px rgba(255,136,204,.4);transform:scale(1.2) translateY(-2px)}
+  50% {background:#fffacc;box-shadow:0 0 16px #fffacc,0 0 35px rgba(255,250,204,.5);transform:scale(1.4) translateY(-4px)}
+  75% {background:#9966ff;box-shadow:0 0 12px #9966ff,0 0 28px rgba(153,102,255,.4);transform:scale(1.1) translateY(-2px)}
+  100%{background:#c8a0ff;box-shadow:0 0 5px #c8a0ff;transform:scale(1) translateY(0)}
+}
+
+/* Rebirth row — warm gold, serif, the light breathing */
+@keyframes kfDebugDot {
+  0%  {background:#1a0028;box-shadow:0 0 2px rgba(255,26,136,.2);transform:scale(0.7)}
+  45% {background:#ff1a88;box-shadow:0 0 10px #ff1a88,0 0 26px rgba(255,26,136,.6);transform:scale(1.2)}
+  75% {background:#ff66bb;box-shadow:0 0 16px #ff66bb,0 0 40px rgba(255,102,187,.6);transform:scale(1.4)}
+  100%{background:#00ffee;box-shadow:0 0 14px #00ffee,0 0 35px rgba(0,255,238,.5);transform:scale(1.1)}
+}
+
+
+
+/* The Golden Hour row — warm amber, the dusk light breathing */
+.dbg-btn[data-rarity="THEGOLDENHOUR"] {
+  font-family:'Georgia','Times New Roman',serif;
+  background:linear-gradient(90deg,rgba(255,179,71,.12) 0%,rgba(255,120,30,.05) 55%,transparent 100%);
+}
+.dbg-btn[data-rarity="THEGOLDENHOUR"]:hover {
+  background:linear-gradient(90deg,rgba(255,200,100,.22) 0%,rgba(255,140,40,.08) 55%,transparent 100%);
+}
+.dbg-btn[data-rarity="THEGOLDENHOUR"] .dbg-btn-dot {
+  animation:tgohDebugDot 3.6s ease-in-out infinite alternate;
+}
+@keyframes tgohDebugDot {
+  0%  {background:#1a0800;box-shadow:0 0 2px rgba(255,179,71,.2);transform:scale(0.65)}
+  30% {background:#ffb347;box-shadow:0 0 10px #ffb347,0 0 25px rgba(255,179,71,.5);transform:scale(1.1)}
+  65% {background:#fff4b8;box-shadow:0 0 18px #fff4b8,0 0 45px rgba(255,240,180,.65),0 0 90px rgba(255,200,80,.35);transform:scale(1.45)}
+  100%{background:#ff7a00;box-shadow:0 0 14px #ff7a00,0 0 35px rgba(255,120,0,.55);transform:scale(1.2)}
+}
 .dbg-util-btn{
   width:calc(100% - 28px);margin:4px 14px;padding:6px 10px;
   background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);

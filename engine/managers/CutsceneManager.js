@@ -16,6 +16,11 @@ import { VoidAwakens }    from '../../cutscenes/VoidAwakens.js';
 import { SacredBlade }    from '../../cutscenes/SacredBlade.js';
 import { TheObserver }    from '../../cutscenes/TheObserver.js';
 import { TheFractal }     from '../../cutscenes/TheFractal.js';
+import { TheLastLight }   from '../../cutscenes/TheLastLight.js';
+import { TheNation }        from '../../cutscenes/TheNation.js';
+import { TheEndlessDream }  from '../../cutscenes/TheEndlessDream.js';
+import { Rebirth }           from '../../cutscenes/Rebirth.js';
+import { TheGoldenHour }    from '../../cutscenes/TheGoldenHour.js';
 
 const SCENE_MAP = {
   NormalScene,
@@ -35,6 +40,11 @@ const SCENE_MAP = {
   SacredBlade,
   TheObserver,
   TheFractal,
+  TheLastLight,
+  TheNation,
+  TheEndlessDream,
+  Rebirth,
+  TheGoldenHour,
 };
 
 export class CutsceneManager {

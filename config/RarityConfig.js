@@ -330,12 +330,105 @@ export const RARITIES = {
     ],
   },
 
-};
+  // weight 0.002506 → pool / 0.002506 ≈ 400,000
+  THELASTLIGHT: {
+    id: 'THELASTLIGHT', label: 'The Last Light', weight: 0.002506, debugOdds: '1/400,000', badge: '🕯',
+    color: '#ff9933', glowColor: 'rgba(255,80,0,0.99)', particleColor: '#fff8f0',
+    bgColor: 'rgba(4,1,0,1)',
+    textShadow: '0 0 8px #ff9933, 0 0 22px #ff4400, 0 0 60px rgba(255,68,0,.55), 0 0 140px rgba(255,40,0,.25)',
+    cutscene: 'TheLastLight',
+    effects: {
+      shakeIntensity: 90, particleCount: 320, rayCount: 48,
+      glowMaxAlpha: 0.95, auraCount: 6, trailEnabled: true,
+    },
+    items: [
+      { id: 'dying_ember',    name: 'Dying Ember',     icon: '🕯' },
+      { id: 'last_photon',    name: 'Last Photon',     icon: '✦' },
+      { id: 'heat_remnant',   name: 'Heat Remnant',    icon: '🔥' },
+      { id: 'final_witness',  name: 'Final Witness',   icon: '◎' },
+    ],
+  },
 
+  // weight 0.002005 → pool / 0.002005 ≈ 500,000
+  THENATION: {
+    id: 'THENATION', label: 'The Nation', weight: 0.002005, debugOdds: '1/500,000', badge: '♛',
+    color: '#ffd700', glowColor: 'rgba(255,215,0,0.99)', particleColor: '#f5e6c8',
+    bgColor: 'rgba(5,3,0,1)',
+    textShadow: '0 0 8px #ffd700, 0 0 24px rgba(255,215,0,.7), 0 0 65px rgba(255,200,0,.4), 0 0 150px rgba(255,180,0,.2)',
+    cutscene: 'TheNation',
+    effects: {
+      shakeIntensity: 85, particleCount: 300, rayCount: 56,
+      glowMaxAlpha: 0.95, auraCount: 8, trailEnabled: true,
+    },
+    items: [
+      { id: 'founding_seal',  name: 'Founding Seal',   icon: '♛' },
+      { id: 'banner_shard',   name: 'Banner Shard',    icon: '⚑' },
+      { id: 'crown_fragment', name: 'Crown Fragment',  icon: '♔' },
+      { id: 'peoples_oath',   name: "People's Oath",   icon: '✦' },
+    ],
+  },
+
+  // weight 0.001671 → pool / 0.001671 ≈ 600,000
+  THEENDLESSDREAM: {
+    id: 'THEENDLESSDREAM', label: 'The Endless Dream', weight: 0.001671, debugOdds: '1/600,000', badge: '∿',
+    color: '#c8a0ff', glowColor: 'rgba(200,160,255,0.99)', particleColor: '#fffacc',
+    bgColor: 'rgba(3,0,12,1)',
+    textShadow: '0 0 8px #c8a0ff, 0 0 25px rgba(200,160,255,.8), 0 0 70px rgba(153,102,255,.5), 0 0 160px rgba(120,60,220,.25)',
+    cutscene: 'TheEndlessDream',
+    effects: {
+      shakeIntensity: 40, particleCount: 240, rayCount: 44,
+      glowMaxAlpha: 0.88, auraCount: 6, trailEnabled: true,
+    },
+    items: [
+      { id: 'falling_shard',   name: 'Falling Shard',   icon: '∿' },
+      { id: 'dream_petal',     name: 'Dream Petal',     icon: '🌸' },
+      { id: 'broken_clock',    name: 'Broken Clock',    icon: '⌛' },
+      { id: 'ghost_memory',    name: 'Ghost Memory',    icon: '◌' },
+    ],
+  },
+
+  // weight 0.001432 → pool / 0.001432 ≈ 700,000
+  REBIRTH: {
+    id: 'REBIRTH', label: 'Rebirth', weight: 0.001432, debugOdds: '1/700,000', badge: '✦',
+    color: '#ffd080', glowColor: 'rgba(255,208,128,0.99)', particleColor: '#fff8e8',
+    bgColor: 'rgba(6,2,0,1)',
+    textShadow: '0 0 10px #ffd080, 0 0 28px rgba(255,208,128,.8), 0 0 80px rgba(255,180,60,.5), 0 0 200px rgba(255,140,40,.25)',
+    cutscene: 'Rebirth',
+    effects: {
+      shakeIntensity: 75, particleCount: 300, rayCount: 52,
+      glowMaxAlpha: 0.95, auraCount: 8, trailEnabled: true,
+    },
+    items: [
+      { id: 'soul_ember',     name: 'Soul Ember',      icon: '✦' },
+      { id: 'first_light',    name: 'First Light',     icon: '◎' },
+      { id: 'ancient_word',   name: 'Ancient Word',    icon: '𝕿' },
+      { id: 'bloom_shard',    name: 'Bloom Shard',     icon: '🌟' },
+    ],
+  },
+
+  // weight 0.001253 → pool / 0.001253 ≈ 800,000
+  THEGOLDENHOUR: {
+    id: 'THEGOLDENHOUR', label: 'The Golden Hour', weight: 0.001253, debugOdds: '1/800,000', badge: '☀',
+    color: '#ffb347', glowColor: 'rgba(255,179,71,0.99)', particleColor: '#fff4b8',
+    bgColor: 'rgba(6,3,0,1)',
+    textShadow: '0 0 10px #ffb347, 0 0 30px rgba(255,179,71,.8), 0 0 80px rgba(255,140,40,.5), 0 0 200px rgba(255,100,20,.25)',
+    cutscene: 'TheGoldenHour',
+    effects: {
+      shakeIntensity: 70, particleCount: 320, rayCount: 60,
+      glowMaxAlpha: 0.95, auraCount: 8, trailEnabled: true,
+    },
+    items: [
+      { id: 'amber_fragment',  name: 'Amber Fragment',  icon: '☀' },
+      { id: 'last_ray',        name: 'Last Ray',        icon: '◐' },
+      { id: 'golden_dust',     name: 'Golden Dust',     icon: '✦' },
+      { id: 'dusk_memory',     name: 'Dusk Memory',     icon: '◑' },
+    ],
+  },
+};
 // Ordered most common → rarest
 export const RARITY_ORDER = [
   'COMMON', 'UNCOMMON', 'RARE', 'EPIC', 'LEGENDARY',
-  'MYTHIC', 'DIVINE', 'SUPERNOVA', 'SERAPHIM', 'CONVERGENCE', 'MATRIX', 'ELDRITCH', 'TIMECOLLAPSE', 'PIXELGENESIS', 'VOIDAWAKENS', 'SACREDBLADE', 'THEOBSERVER', 'THEFRACTAL',
+  'MYTHIC', 'DIVINE', 'SUPERNOVA', 'SERAPHIM', 'CONVERGENCE', 'MATRIX', 'ELDRITCH', 'TIMECOLLAPSE', 'PIXELGENESIS', 'VOIDAWAKENS', 'SACREDBLADE', 'THEOBSERVER', 'THEFRACTAL', 'THELASTLIGHT', 'THENATION', 'THEENDLESSDREAM', 'REBIRTH', 'THEGOLDENHOUR',
 ];
 
 export function getRarityByWeight(roll) {
