@@ -22,6 +22,7 @@ import { TheEndlessDream } from "../../cutscenes/TheEndlessDream.js";
 import { Rebirth } from "../../cutscenes/Rebirth.js";
 import { TheGoldenHour } from "../../cutscenes/TheGoldenHour.js";
 import { NightFall } from "../../cutscenes/NightFall.js";
+import { TheJudgement } from "../../cutscenes/TheJudgement.js";
 
 const SCENE_MAP = {
   NormalScene,
@@ -47,6 +48,7 @@ const SCENE_MAP = {
   Rebirth,
   TheGoldenHour,
   NightFall,
+  TheJudgement,
 };
 
 export class CutsceneManager {

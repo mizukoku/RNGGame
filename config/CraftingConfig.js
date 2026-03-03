@@ -324,6 +324,25 @@ export const RECIPES = [
     },
     category: "synergy",
   },
+
+  {
+    id: "final_verdict",
+    name: "Final Verdict",
+    icon: "⚖",
+    desc: "The dream met the judge. Only one could remain standing.",
+    ingredients: [
+      { rarityId: "THEJUDGEMENT", count: 1 },
+      { rarityId: "THEENDLESSDREAM", count: 1 },
+    ],
+    buff: {
+      name: "Final Verdict",
+      icon: "⚖",
+      multiplier: 1000.0,
+      rolls: 5,
+      color: "#ffd700",
+    },
+    category: "synergy",
+  },
 ];
 
 export const CATEGORIES = [
@@ -352,4 +371,5 @@ export const CATEGORIES = [
   { id: "timecollapse", label: "⧗ Time Collapse", color: "#64c8ff" },
   { id: "eldritch", label: "👁 Eldritch", color: "#c084fc" },
   { id: "synergy", label: "✦ Synergy", color: "#a78bfa" },
+  { id: "thejudgement", label: "⚖ The Judgement", color: "#ffd700" },
 ];

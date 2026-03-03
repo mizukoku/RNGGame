@@ -26,6 +26,7 @@ export class PlayerState {
       REBIRTH: 0,
       THEGOLDENHOUR: 0,
       NIGHTFALL: 0,
+      THEJUDGEMENT: 0,
     };
     this.inventory = {};
     this.rarityStats = {};

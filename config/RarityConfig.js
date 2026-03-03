@@ -671,6 +671,37 @@ export const RARITIES = {
       { id: "night_echo", name: "Night Echo", icon: "◌" },
     ],
   },
+
+  THEJUDGEMENT: {
+    id: "THEJUDGEMENT",
+    label: "The Judgement",
+    weight: 0.001002,
+    debugOdds: "1/1,000,000",
+    badge: "⚖",
+    color: "#ffd700",
+    glowColor: "rgba(255,215,0,0.99)",
+    particleColor: "#fffef0",
+    bgColor: "rgba(4,2,0,1)",
+    textShadow: [
+      "0 0 10px #ffd700",
+      "0 0 30px rgba(255,215,0,.8)",
+      "0 0 80px rgba(255,140,0,.5)",
+      "0 0 200px rgba(255,100,0,.25)",
+    ].join(", "),
+    cutscene: "TheJudgement",
+    effects: {
+      shakeIntensity: 0, // handled entirely inside the cutscene
+      particleCount: 0,
+      glowMaxAlpha: 0,
+      trailEnabled: false,
+    },
+    items: [
+      { id: "verdict_shard", name: "Verdict Shard", icon: "⚖" },
+      { id: "final_ruling", name: "Final Ruling", icon: "⚔" },
+      { id: "determination", name: "Determination", icon: "❤" },
+      { id: "judges_eye", name: "Judge's Eye", icon: "👁" },
+    ],
+  },
 };
 
 // Ordered most common → rarest
@@ -699,6 +730,7 @@ export const RARITY_ORDER = [
   "REBIRTH",
   "THEGOLDENHOUR",
   "NIGHTFALL",
+  "THEJUDGEMENT",
 ];
 
 export function getRarityByWeight(roll) {
