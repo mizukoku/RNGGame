@@ -402,16 +402,8 @@ export class TheJudgement {
       if (!this._running) return;
 
       if (result === "win") {
-        await this._dialogue(WIN_LINES, true);
-        if (!this._running) return;
         this._audio.stop();
-        await this._laserWallDeath();
-        if (!this._running) return;
-        await this._heartBreak();
-        if (!this._running) return;
-        await this._refusedScreen();
-        if (!this._running) return;
-        await this._winCutscene();
+        await this._winEndingSequence();
       } else {
         this._audio.stop();
         await this._gameOverScreen();
@@ -907,18 +899,82 @@ export class TheJudgement {
       );
     };
 
+    // At boss HP=1, cap total blasts spawned this round to 1 so it stays fair
+    let _blastCount = -2;
+    const _blastCap = gs.bossHP <= 0 ? 1 : 99;
+
     const blast = (delayMs) => {
+      if (_blastCount++ >= _blastCap) return;
+      // Pick a Y that avoids the center-reset zone (heart always resets to CY)
+      // Split into top-third or bottom-third to keep center safe
+      const safeZone = BOX.H * 0.28; // avoid ±28% around center
+      const topY = BY + 18 + Math.random() * (BOX.H / 2 - safeZone - 18);
+      const botY =
+        BY + BOX.H / 2 + safeZone + Math.random() * (BOX.H / 2 - safeZone - 18);
       const bl = {
-        y: BY + 30 + Math.random() * (BOX.H - 60),
+        y: Math.random() < 0.5 ? topY : botY,
         firing: false,
         timer: 0,
         h: 22 + round,
+        skullSide: "L", // single skull on left edge
       };
       gs.blasts.push(bl);
+      // Guarantee at least 1100ms of telegraph time before firing,
+      // regardless of the caller's delayMs, so the player always sees the warning
+      const minWarn = 1100;
+      const fireDelay = Math.max(delayMs + minWarn, minWarn);
       const id = setTimeout(() => {
         bl.firing = true;
         bl.timer = 1.0;
-      }, delayMs);
+      }, fireDelay);
+      this._timers.push(id);
+    };
+
+    // Vertical laser — fires from top of box to bottom at a safe X column
+    const blast_v = (delayMs) => {
+      if (_blastCount++ >= _blastCap) return;
+      const safeZone = BOX.W * 0.28;
+      const leftX = BX + 18 + Math.random() * (BOX.W / 2 - safeZone - 18);
+      const rightX =
+        BX + BOX.W / 2 + safeZone + Math.random() * (BOX.W / 2 - safeZone - 18);
+      const bw = 20 + round * 0.8;
+      const bl = {
+        dir: "v",
+        x: Math.random() < 0.5 ? leftX : rightX,
+        w: bw,
+        firing: false,
+        timer: 0,
+      };
+      gs.blasts.push(bl);
+      const fireDelay = Math.max(delayMs + 1100, 1100);
+      const id = setTimeout(() => {
+        bl.firing = true;
+        bl.timer = 1.0;
+      }, fireDelay);
+      this._timers.push(id);
+    };
+
+    // Diagonal laser — slashes from one corner to the opposite
+    const blast_d = (delayMs) => {
+      if (_blastCount++ >= _blastCap) return;
+      const slash = Math.random() < 0.5; // true = \ , false = /
+      const thick = 28 + round;
+      const bl = {
+        dir: "d",
+        x1: slash ? BX : BX + BOX.W,
+        y1: BY,
+        x2: slash ? BX + BOX.W : BX,
+        y2: BY + BOX.H,
+        thick,
+        firing: false,
+        timer: 0,
+      };
+      gs.blasts.push(bl);
+      const fireDelay = Math.max(delayMs + 1100, 1100);
+      const id = setTimeout(() => {
+        bl.firing = true;
+        bl.timer = 1.0;
+      }, fireDelay);
       this._timers.push(id);
     };
 
@@ -944,44 +1000,49 @@ export class TheJudgement {
       v(3000, 0.45);
       h(4000, true, 0.18);
     }
-    // Round 3: blast + sweep combos
+    // Round 3: blast + sweep combos, vertical laser introduced
     else if (round === 3) {
       blast(600);
       h(0, true, 0.25);
       h(1500, false, 0.5);
       d(2400, 2);
+      blast_v(2800);
       v(3200, 0.35);
       h(4000, false, 0.72);
     }
-    // Round 4: faster, 2 blasts, diagonals
+    // Round 4: faster, 2 blasts, diagonal laser introduced
     else if (round === 4) {
       blast(500);
       h(0, false, 0.3);
       d(1000, 1);
       h(1800, true, 0.55);
+      blast_d(2000);
       blast(2400);
       v(2800, 0.6);
       d(3400, 3);
       h(4200, true, 0.2);
     }
-    // Round 5: high pressure but readable
+    // Round 5: vertical + diagonal blasts mixed in
     else if (round === 5) {
       blast(400);
       h(0, true, 0.2);
+      blast_v(800);
       h(1100, false, 0.55);
       d(1800, 0);
+      blast_d(2000);
       blast(2200);
       v(2600, 0.3);
       v(3200, 0.65);
       h(3800, true, 0.38);
       d(4400, 3);
     }
-    // Round 6: 3 blasts, fast sequence
+    // Round 6: 3 blasts of mixed types
     else if (round === 6) {
       blast(200);
       h(0, false, 0.18);
       h(900, true, 0.45);
-      blast(1600);
+      blast_v(1400);
+      blast_d(1600);
       d(1800, 2);
       v(2400, 0.4);
       h(3000, false, 0.68);
@@ -989,11 +1050,15 @@ export class TheJudgement {
       d(3800, 1);
       v(4300, 0.22);
     }
-    // Round 7+: full barrage — still staggered, but dense
+    // Round 7+: full barrage with all types
     else {
       blast(200);
+      blast_v(600);
+      blast_d(800);
       blast(1200);
+      blast_d(1600);
       blast(2400);
+      blast_v(2800);
       h(0, true, 0.15);
       h(700, false, 0.42);
       d(1000, 0);
@@ -1084,7 +1149,32 @@ export class TheJudgement {
           }
         }
         for (const bl of gs.blasts) {
-          if (bl.firing && gs.heart.y >= bl.y && gs.heart.y <= bl.y + bl.h) {
+          if (!bl.firing) continue;
+          let blHit = false;
+          if (!bl.dir || bl.dir === "h") {
+            blHit = gs.heart.y >= bl.y && gs.heart.y <= bl.y + bl.h;
+          } else if (bl.dir === "v") {
+            blHit = gs.heart.x >= bl.x && gs.heart.x <= bl.x + bl.w;
+          } else if (bl.dir === "d") {
+            const ddx = bl.x2 - bl.x1,
+              ddy = bl.y2 - bl.y1;
+            const len2 = ddx * ddx + ddy * ddy;
+            const tt = Math.max(
+              0,
+              Math.min(
+                1,
+                ((gs.heart.x - bl.x1) * ddx + (gs.heart.y - bl.y1) * ddy) /
+                  len2,
+              ),
+            );
+            blHit =
+              Math.hypot(
+                gs.heart.x - (bl.x1 + tt * ddx),
+                gs.heart.y - (bl.y1 + tt * ddy),
+              ) <
+              bl.thick / 2 + HS;
+          }
+          if (blHit) {
             this._hitPlayer(gs);
             if (gs.done) return;
             break;
@@ -1306,20 +1396,104 @@ export class TheJudgement {
       }
       ctx.restore();
 
-      // Blasts
+      // Blasts + mini Gaster skull telegraphs
+      // Outer clip: slightly larger than box to let skulls peek at edges
+      const SK_W = 38,
+        SK_H = 28;
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(BX - SK_W, BY - SK_H, BOX.W + SK_W * 2, BOX.H + SK_H * 2);
+      ctx.clip();
       for (const bl of gs.blasts) {
-        if (bl.firing) {
-          ctx.fillStyle = "rgba(255,255,200,.9)";
-          ctx.fillRect(BX, bl.y, BOX.W, bl.h);
-        } else {
-          const a = 0.08 + 0.07 * Math.sin(performance.now() / 75);
-          ctx.fillStyle = `rgba(255,238,0,${a})`;
-          ctx.fillRect(BX, bl.y, BOX.W, bl.h);
-          ctx.fillStyle = `rgba(255,238,0,${a * 4})`;
-          ctx.fillRect(BX, bl.y, 5, bl.h);
-          ctx.fillRect(BX + BOX.W - 5, bl.y, 5, bl.h);
+        const a = 0.08 + 0.07 * Math.sin(performance.now() / 75);
+        const chargeP = bl.firing
+          ? 1
+          : 0.35 + 0.35 * Math.sin(performance.now() / 120);
+        const skullA = bl.firing
+          ? 1
+          : 0.7 + 0.3 * Math.sin(performance.now() / 120);
+
+        if (!bl.dir || bl.dir === "h") {
+          // beam (clipped to box)
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(BX, BY, BOX.W, BOX.H);
+          ctx.clip();
+          if (bl.firing) {
+            ctx.fillStyle = "rgba(255,255,200,.9)";
+            ctx.fillRect(BX, bl.y, BOX.W, bl.h);
+          } else {
+            ctx.fillStyle = `rgba(255,238,0,${a})`;
+            ctx.fillRect(BX, bl.y, BOX.W, bl.h);
+            ctx.fillStyle = `rgba(255,238,0,${a * 4})`;
+            ctx.fillRect(BX, bl.y, 5, bl.h);
+            ctx.fillRect(BX + BOX.W - 5, bl.y, 5, bl.h);
+          }
+          ctx.restore();
+          // skull left edge
+          ctx.save();
+          ctx.globalAlpha = skullA;
+          ctx.translate(BX - SK_W * 0.5, bl.y + bl.h / 2);
+          this._drawGasterBlaster(ctx, SK_W, SK_H, chargeP, bl.firing, false);
+          ctx.restore();
+        } else if (bl.dir === "v") {
+          // beam (clipped to box)
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(BX, BY, BOX.W, BOX.H);
+          ctx.clip();
+          if (bl.firing) {
+            ctx.fillStyle = "rgba(255,255,200,.9)";
+            ctx.fillRect(bl.x, BY, bl.w, BOX.H);
+          } else {
+            ctx.fillStyle = `rgba(255,238,0,${a})`;
+            ctx.fillRect(bl.x, BY, bl.w, BOX.H);
+            ctx.fillStyle = `rgba(255,238,0,${a * 4})`;
+            ctx.fillRect(bl.x, BY, bl.w, 5);
+            ctx.fillRect(bl.x, BY + BOX.H - 5, bl.w, 5);
+          }
+          ctx.restore();
+          // skull above column, rotated to face downward
+          ctx.save();
+          ctx.globalAlpha = skullA;
+          ctx.translate(bl.x + bl.w / 2, BY - SK_H * 0.5);
+          ctx.rotate(Math.PI / 2);
+          this._drawGasterBlaster(ctx, SK_W, SK_H, chargeP, bl.firing, false);
+          ctx.restore();
+        } else if (bl.dir === "d") {
+          // beam (clipped to box)
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(BX, BY, BOX.W, BOX.H);
+          ctx.clip();
+          if (bl.firing) {
+            ctx.strokeStyle = "rgba(255,255,200,.9)";
+            ctx.shadowColor = "#ffffcc";
+            ctx.shadowBlur = 20;
+          } else {
+            ctx.strokeStyle = `rgba(255,238,0,${a * 2.5})`;
+            ctx.shadowColor = `rgba(255,238,0,${a * 4})`;
+            ctx.shadowBlur = 8;
+          }
+          ctx.lineWidth = bl.thick;
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.moveTo(bl.x1, bl.y1);
+          ctx.lineTo(bl.x2, bl.y2);
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+          ctx.restore();
+          // skull at the starting corner, rotated along diagonal direction
+          const angle = Math.atan2(bl.y2 - bl.y1, bl.x2 - bl.x1);
+          ctx.save();
+          ctx.globalAlpha = skullA;
+          ctx.translate(bl.x1, bl.y1);
+          ctx.rotate(angle);
+          this._drawGasterBlaster(ctx, SK_W, SK_H, chargeP, bl.firing, false);
+          ctx.restore();
         }
       }
+      ctx.restore();
 
       // Bones
       for (const b of gs.bones) this._drawBone(ctx, b.x, b.y, b.w, b.h);
@@ -1499,6 +1673,536 @@ export class TheJudgement {
   }
 
   // ══════════════════════════════════════════════════════════════
+  //  WIN ENDING SEQUENCE — laser → heartbreak → refused → win
+  //  One persistent canvas; heart never disappears once visible.
+  // ══════════════════════════════════════════════════════════════
+  async _winEndingSequence() {
+    this._clear();
+
+    // One persistent canvas: laser wall -> heart appears -> cracks (stays visible)
+    // -> text types in (heart cracked) -> heart reforms -> gold cutscene
+    const W = Math.min(window.innerWidth, 760);
+    const H = Math.min(window.innerHeight, 560);
+    const WF = window.innerWidth,
+      HF = window.innerHeight;
+    const CX = W / 2,
+      CY = H / 2 + 20;
+    const BX = CX - BOX.W / 2,
+      BY = CY - BOX.H / 2;
+    const HX = CX,
+      HY = CY; // heart center = battle box center
+
+    const canvas = document.createElement("canvas");
+    canvas.width = W;
+    canvas.height = H;
+    Object.assign(canvas.style, {
+      display: "block",
+      imageRendering: "pixelated",
+    });
+    const ui = document.createElement("div");
+    Object.assign(ui.style, {
+      position: "absolute",
+      inset: "0",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      pointerEvents: "none",
+    });
+    this._overlay.appendChild(canvas);
+    this._overlay.appendChild(ui);
+    const ctx = canvas.getContext("2d");
+
+    const drawScene = () => {
+      ctx.fillStyle = C.BG;
+      ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = C.WHITE;
+      ctx.lineWidth = 3;
+      ctx.strokeRect(BX, BY, BOX.W, BOX.H);
+      ctx.save();
+      ctx.globalAlpha = 0.25;
+      ctx.translate(CX, BY - 52);
+      ctx.scale(1.32, 1.32);
+      this._drawBossIcon(ctx, 0, 0, true);
+      ctx.restore();
+    };
+
+    // PHASE 1: LASER WALL
+    const N = 4,
+      BS_W = 70,
+      BS_H = 48;
+    const laserY = Array.from(
+      { length: N },
+      (_, i) => BY + (BOX.H * (i + 0.5)) / N,
+    );
+    let t = 0,
+      last = performance.now(),
+      chargeStarted = false;
+    let lPhase = "appear";
+    const APPEAR = 0.55,
+      CHARGE = 1.8,
+      FIRE = 0.08,
+      FLASH = 0.5;
+
+    await this._wait(320);
+    if (!this._running) return;
+
+    await new Promise((resolve) => {
+      const loop = (now) => {
+        if (!this._running) {
+          resolve();
+          return;
+        }
+        const dt = Math.min((now - last) / 1000, 0.05);
+        last = now;
+        t += dt;
+        drawScene();
+        if (lPhase === "appear") {
+          const p = Math.min(t / APPEAR, 1);
+          this._drawBoxLasers(ctx, laserY, p, 0, BX, BY, BS_W, BS_H, false);
+          this._drawPixelHeart(ctx, HX, HY, 14, 1);
+          if (p >= 1) {
+            lPhase = "charge";
+            t = 0;
+          }
+        } else if (lPhase === "charge") {
+          if (!chargeStarted) {
+            this._audio.sfx("laserCharge");
+            chargeStarted = true;
+          }
+          const p = Math.min(t / CHARGE, 1);
+          this._drawBoxLasers(ctx, laserY, 1, p, BX, BY, BS_W, BS_H, false);
+          for (const y of laserY) {
+            ctx.fillStyle = `rgba(255,255,160,${p * 0.3})`;
+            ctx.fillRect(BX + 1, y - 4, BOX.W - 2, 8);
+          }
+          this._drawPixelHeart(ctx, HX, HY, 14, 1 - p * 0.35);
+          if (p >= 1) {
+            lPhase = "fire";
+            t = 0;
+            this._audio.sfx("laserFire");
+          }
+        } else if (lPhase === "fire") {
+          const p = Math.min(t / FIRE, 1);
+          this._drawBoxLasers(ctx, laserY, 1, 1, BX, BY, BS_W, BS_H, true);
+          for (const y of laserY) {
+            const bh = 18;
+            const g = ctx.createLinearGradient(BX, y - bh / 2, BX, y + bh / 2);
+            g.addColorStop(0, "rgba(255,255,220,0)");
+            g.addColorStop(0.4, "rgba(255,255,200,.96)");
+            g.addColorStop(0.5, "rgba(255,255,255,1)");
+            g.addColorStop(0.6, "rgba(255,255,200,.96)");
+            g.addColorStop(1, "rgba(255,255,220,0)");
+            ctx.fillStyle = g;
+            ctx.fillRect(BX, y - bh / 2, BOX.W, bh);
+          }
+          this._drawPixelHeart(ctx, HX, HY, 14, Math.max(0, 1 - p * 4));
+          if (p >= 1) {
+            lPhase = "flash";
+            t = 0;
+          }
+        } else if (lPhase === "flash") {
+          const p = Math.min(t / FLASH, 1);
+          ctx.fillStyle = `rgba(255,255,255,${1 - p})`;
+          ctx.fillRect(0, 0, W, H);
+          if (p >= 1) {
+            resolve();
+            return;
+          }
+        }
+        this._animId = requestAnimationFrame(loop);
+      };
+      this._animId = requestAnimationFrame(loop);
+    });
+    if (!this._running) return;
+
+    // PHASE 2: HEART APPEARS
+    const PS = 10;
+    t = 0;
+    last = performance.now();
+    await new Promise((resolve) => {
+      const loop = (now) => {
+        if (!this._running) {
+          resolve();
+          return;
+        }
+        const dt = Math.min((now - last) / 1000, 0.05);
+        last = now;
+        t += dt;
+        const p = Math.min(t / 0.55, 1);
+        drawScene();
+        ctx.shadowColor = C.HEART;
+        ctx.shadowBlur = 18 * p;
+        this._drawPixelHeart(ctx, HX, HY, PS, p);
+        ctx.shadowBlur = 0;
+        if (p >= 1) {
+          resolve();
+          return;
+        }
+        this._animId = requestAnimationFrame(loop);
+      };
+      this._animId = requestAnimationFrame(loop);
+    });
+    if (!this._running) return;
+
+    t = 0;
+    last = performance.now();
+    await new Promise((resolve) => {
+      const loop = (now) => {
+        if (!this._running) {
+          resolve();
+          return;
+        }
+        const dt = Math.min((now - last) / 1000, 0.05);
+        last = now;
+        t += dt;
+        drawScene();
+        ctx.shadowColor = C.HEART;
+        ctx.shadowBlur = 20 + Math.sin(t * 6) * 6;
+        this._drawPixelHeart(ctx, HX, HY, PS, 1);
+        ctx.shadowBlur = 0;
+        if (t >= 0.5) {
+          resolve();
+          return;
+        }
+        this._animId = requestAnimationFrame(loop);
+      };
+      this._animId = requestAnimationFrame(loop);
+    });
+    if (!this._running) return;
+
+    // PHASE 3: CRACK -> SPLIT (halves stay fully visible, no fading)
+    const FINAL_GAP = PS * 3.5;
+    const P_CRACK = 0.7,
+      P_SHAKE = 0.45,
+      P_SPLIT = 0.65;
+    t = 0;
+    last = performance.now();
+    let crackSfxDone = false,
+      breakSfxDone = false;
+
+    const drawHalves = (lx, rx, yOff, alpha) => {
+      ctx.shadowColor = C.HEART;
+      ctx.shadowBlur = 12;
+      this._drawPixelHalfHeart(ctx, "L", lx, HY + yOff, PS, alpha);
+      this._drawPixelHalfHeart(ctx, "R", rx, HY + yOff, PS, alpha);
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = "rgba(0,0,0,0.85)";
+      ctx.fillRect(HX - 1, HY - 4.5 * PS + yOff, 2, 9 * PS);
+    };
+
+    await new Promise((resolve) => {
+      const loop = (now) => {
+        if (!this._running) {
+          resolve();
+          return;
+        }
+        const dt = Math.min((now - last) / 1000, 0.05);
+        last = now;
+        t += dt;
+        drawScene();
+        if (t < P_CRACK) {
+          const p = t / P_CRACK;
+          if (!crackSfxDone && p > 0.25) {
+            this._audio.sfx("heartCrack");
+            crackSfxDone = true;
+          }
+          const gap = p * PS * 0.6;
+          ctx.shadowColor = C.HEART;
+          ctx.shadowBlur = 16;
+          this._drawPixelHalfHeart(ctx, "L", HX - gap / 2, HY, PS, 1);
+          this._drawPixelHalfHeart(ctx, "R", HX + gap / 2, HY, PS, 1);
+          ctx.shadowBlur = 0;
+          if (p > 0.2) {
+            ctx.fillStyle = `rgba(0,0,0,${Math.min(1, (p - 0.2) / 0.4) * 0.85})`;
+            ctx.fillRect(HX - 1, HY - 4.5 * PS, 2, 9 * PS);
+          }
+        } else if (t < P_CRACK + P_SHAKE) {
+          const p = (t - P_CRACK) / P_SHAKE;
+          const shk = (1 - p) * PS * 0.85;
+          const sx = (Math.random() - 0.5) * shk * 2,
+            sy = (Math.random() - 0.5) * shk;
+          drawHalves(HX - PS * 0.3 + sx, HX + PS * 0.3 + sx, sy, 1);
+        } else {
+          const p = Math.min((t - P_CRACK - P_SHAKE) / P_SPLIT, 1);
+          if (!breakSfxDone) {
+            this._audio.sfx("heartBreak");
+            breakSfxDone = true;
+          }
+          const ease = 1 - Math.pow(1 - p, 2);
+          const gap = PS * 0.6 + (FINAL_GAP - PS * 0.6) * ease;
+          drawHalves(HX - gap / 2, HX + gap / 2, 0, 1);
+          if (p >= 1) {
+            resolve();
+            return;
+          }
+        }
+        this._animId = requestAnimationFrame(loop);
+      };
+      this._animId = requestAnimationFrame(loop);
+    });
+    if (!this._running) return;
+
+    // PHASE 4: TEXT TYPES IN — heart stays cracked the whole time
+    let keepHolding = true;
+    const holdCracked = () => {
+      if (!this._running || !keepHolding) return;
+      drawScene();
+      drawHalves(HX - FINAL_GAP / 2, HX + FINAL_GAP / 2, 0, 1);
+      this._animId = requestAnimationFrame(holdCracked);
+    };
+    this._animId = requestAnimationFrame(holdCracked);
+
+    const textEl = document.createElement("div");
+    Object.assign(textEl.style, {
+      fontFamily: FONT,
+      fontSize: "clamp(12px,2vw,20px)",
+      color: C.WHITE,
+      letterSpacing: ".04em",
+      opacity: "0",
+      marginBottom: "120px",
+    });
+    textEl.textContent = "";
+    ui.appendChild(textEl);
+
+    await this._wait(400);
+    if (!this._running) return;
+    textEl.style.opacity = "1";
+    await this._type(textEl, "* But it refused.", 52);
+    await this._wait(900);
+    if (!this._running) return;
+    keepHolding = false;
+
+    // PHASE 5: REFORM — halves converge, snap together
+    t = 0;
+    last = performance.now();
+    let snapSfx = false;
+    const REFORM_DUR = 0.65,
+      SNAP_AT = 0.75;
+
+    await new Promise((resolve) => {
+      const loop = (now) => {
+        if (!this._running) {
+          resolve();
+          return;
+        }
+        const dt = Math.min((now - last) / 1000, 0.05);
+        last = now;
+        t += dt;
+        const p = Math.min(t / REFORM_DUR, 1);
+        drawScene();
+        if (p < SNAP_AT) {
+          const ease = 1 - Math.pow(1 - p / SNAP_AT, 2);
+          const gap = FINAL_GAP * (1 - ease);
+          ctx.shadowColor = C.HEART;
+          ctx.shadowBlur = 10 + ease * 16;
+          this._drawPixelHalfHeart(ctx, "L", HX - gap / 2, HY, PS, 1);
+          this._drawPixelHalfHeart(ctx, "R", HX + gap / 2, HY, PS, 1);
+          ctx.shadowBlur = 0;
+          if (gap > 1) {
+            ctx.fillStyle = `rgba(0,0,0,${0.85 * (1 - ease)})`;
+            ctx.fillRect(HX - 1, HY - 4.5 * PS, 2, 9 * PS);
+          }
+        } else {
+          const sp = (p - SNAP_AT) / (1 - SNAP_AT);
+          const flashA = Math.max(0, 1 - sp * 2.2);
+          if (!snapSfx) {
+            this._audio.sfx("determination");
+            snapSfx = true;
+          }
+          ctx.shadowColor = C.HEART;
+          ctx.shadowBlur = 14 + flashA * 28;
+          this._drawPixelHeart(ctx, HX, HY, PS, 1);
+          ctx.shadowBlur = 0;
+          if (flashA > 0) {
+            ctx.beginPath();
+            ctx.arc(HX, HY, sp * PS * 20, 0, Math.PI * 2);
+            ctx.strokeStyle = `rgba(255,255,255,${flashA})`;
+            ctx.lineWidth = 4;
+            ctx.stroke();
+          }
+        }
+        if (p >= 1) {
+          resolve();
+          return;
+        }
+        this._animId = requestAnimationFrame(loop);
+      };
+      this._animId = requestAnimationFrame(loop);
+    });
+    if (!this._running) return;
+
+    // PHASE 6: WIN CUTSCENE — full screen, heart beats in the gold burst
+    this._clear();
+    const canvas2 = document.createElement("canvas");
+    canvas2.width = WF;
+    canvas2.height = HF;
+    Object.assign(canvas2.style, {
+      position: "absolute",
+      inset: "0",
+      display: "block",
+    });
+    const ui2 = document.createElement("div");
+    Object.assign(ui2.style, {
+      position: "absolute",
+      inset: "0",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      pointerEvents: "none",
+      gap: "12px",
+    });
+    this._overlay.appendChild(canvas2);
+    this._overlay.appendChild(ui2);
+    const ctx2 = canvas2.getContext("2d");
+    const GCX = WF / 2,
+      GCY = HF / 2;
+
+    const mkLbl = (text, size, color, shadow) => {
+      const el = document.createElement("div");
+      el.textContent = text;
+      Object.assign(el.style, {
+        fontSize: size,
+        fontFamily: FONT,
+        color,
+        letterSpacing: ".22em",
+        textShadow: shadow,
+        opacity: "0",
+        transition: "opacity 1.3s ease",
+      });
+      return el;
+    };
+    const badge = mkLbl(
+      "\u2696",
+      "clamp(40px,7vw,60px)",
+      "#ffd700",
+      "0 0 28px #ffd700, 0 0 65px rgba(255,215,0,.5)",
+    );
+    const titleEl = mkLbl(
+      "DETERMINATION",
+      "clamp(16px,3vw,34px)",
+      "#ffd700",
+      "0 0 22px #ffd700, 0 0 55px rgba(255,215,0,.4)",
+    );
+    const labelEl = mkLbl(
+      "The Judgement",
+      "clamp(10px,1.5vw,18px)",
+      "rgba(255,215,0,.65)",
+      "",
+    );
+    const oddsEl = mkLbl(
+      "1 / 1,000,000",
+      "clamp(8px,1.2vw,13px)",
+      "rgba(255,215,0,.38)",
+      "",
+    );
+    [badge, titleEl, labelEl, oddsEl].forEach((el) => ui2.appendChild(el));
+
+    const pts = Array.from({ length: 320 }, () => this._winPt(GCX, GCY));
+    t = 0;
+    last = performance.now();
+    const tid = setTimeout(
+      () =>
+        [badge, titleEl, labelEl, oddsEl].forEach((el, i) =>
+          setTimeout(() => {
+            el.style.opacity = "1";
+          }, i * 310),
+        ),
+      380,
+    );
+    this._timers.push(tid);
+
+    await new Promise((resolve) => {
+      const loop = (now) => {
+        if (!this._running) {
+          resolve();
+          return;
+        }
+        const dt = (now - last) / 1000;
+        last = now;
+        t += dt;
+        const p = Math.min(t / 7.0, 1);
+        ctx2.fillStyle = "#030200";
+        ctx2.fillRect(0, 0, WF, HF);
+        const gr = ctx2.createRadialGradient(
+          GCX,
+          GCY,
+          0,
+          GCX,
+          GCY,
+          550 + p * 180,
+        );
+        gr.addColorStop(
+          0,
+          `rgba(255,215,0,${0.14 + 0.07 * Math.sin(t * 1.3)})`,
+        );
+        gr.addColorStop(
+          0.55,
+          `rgba(255,100,0,${0.04 * Math.abs(Math.sin(t + 0.8))})`,
+        );
+        gr.addColorStop(1, "transparent");
+        ctx2.fillStyle = gr;
+        ctx2.fillRect(0, 0, WF, HF);
+        for (let i = 0; i < 14; i++) {
+          const ang = (i / 14) * Math.PI * 2 + t * 0.07;
+          const len = 380 + Math.sin(t * 0.8 + i) * 110;
+          ctx2.beginPath();
+          ctx2.moveTo(GCX, GCY);
+          ctx2.lineTo(GCX + Math.cos(ang) * len, GCY + Math.sin(ang) * len);
+          ctx2.strokeStyle = `rgba(255,215,0,${0.055 + 0.025 * Math.sin(t + i)})`;
+          ctx2.lineWidth = 20;
+          ctx2.stroke();
+        }
+        for (const pt of pts) {
+          pt.x += pt.vx * dt;
+          pt.y += pt.vy * dt;
+          pt.vx *= 0.982;
+          pt.vy *= 0.982;
+          pt.life -= dt;
+          if (pt.life <= 0)
+            Object.assign(
+              pt,
+              this._winPt(
+                GCX + (Math.random() - 0.5) * 55,
+                GCY + (Math.random() - 0.5) * 55,
+              ),
+            );
+          ctx2.globalAlpha =
+            Math.max(0, pt.life / pt.maxLife) * (0.5 + p * 0.5);
+          ctx2.fillStyle = pt.col;
+          ctx2.beginPath();
+          ctx2.arc(pt.x, pt.y, pt.sz, 0, Math.PI * 2);
+          ctx2.fill();
+        }
+        ctx2.globalAlpha = 1;
+        const cr = 75 + Math.sin(t * 2.6) * 24;
+        const cg = ctx2.createRadialGradient(GCX, GCY, 0, GCX, GCY, cr);
+        cg.addColorStop(
+          0,
+          `rgba(255,245,190,${0.38 + 0.14 * Math.sin(t * 4)})`,
+        );
+        cg.addColorStop(0.45, "rgba(255,215,0,.15)");
+        cg.addColorStop(1, "transparent");
+        ctx2.fillStyle = cg;
+        ctx2.beginPath();
+        ctx2.arc(GCX, GCY, cr, 0, Math.PI * 2);
+        ctx2.fill();
+        ctx2.shadowColor = C.HEART;
+        ctx2.shadowBlur = 20 + Math.sin(t * 3) * 8;
+        this._drawPixelHeart(ctx2, GCX, GCY, PS, 0.8 + 0.2 * Math.sin(t * 3));
+        ctx2.shadowBlur = 0;
+        if (p >= 1) {
+          resolve();
+          return;
+        }
+        this._animId = requestAnimationFrame(loop);
+      };
+      this._animId = requestAnimationFrame(loop);
+    });
+  }
+
+  // ══════════════════════════════════════════════════════════════
   //  LASER WALL — fires inside the battle box at the heart
   // ══════════════════════════════════════════════════════════════
   async _laserWallDeath() {
@@ -1655,18 +2359,10 @@ export class TheJudgement {
     const ease = slideP < 1 ? slideP * slideP * (3 - 2 * slideP) : 1; // smoothstep
 
     for (const y of positions) {
-      // Left blaster slides in from left edge of box
+      // Single blaster slides in from left edge of box
       const lx = BX - BS_W + (BS_W + 4) * ease;
       ctx.save();
       ctx.translate(lx, y);
-      this._drawGasterBlaster(ctx, BS_W, BS_H, chargeP, firing, false);
-      ctx.restore();
-
-      // Right blaster slides in from right edge of box
-      const rx = BX + BOX.W + BS_W - (BS_W + 4) * ease;
-      ctx.save();
-      ctx.translate(rx, y);
-      ctx.scale(-1, 1);
       this._drawGasterBlaster(ctx, BS_W, BS_H, chargeP, firing, false);
       ctx.restore();
     }

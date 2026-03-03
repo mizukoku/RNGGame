@@ -23,27 +23,30 @@
 //  Phase 13 (20000ms): Resolve
 // ═══════════════════════════════════════════════════════════════
 
-import { ParticleBurst, ContinuousParticles } from '../effects/ParticleBurst.js';
-import { GlowOverlay, RayBurst }               from '../effects/GlowOverlay.js';
+import {
+  ParticleBurst,
+  ContinuousParticles,
+} from "../effects/ParticleBurst.js";
+import { GlowOverlay, RayBurst } from "../effects/GlowOverlay.js";
 
 // ── Palette ───────────────────────────────────────────────────
-const VP  = '#9060ff';              // void purple
-const VL  = '#c8a8ff';              // void lavender
-const VW  = '#f0e8ff';              // void white-violet
-const VD  = '#1a0040';              // void deep
-const VB  = '#6040e0';              // void blue-purple
-const VT  = '#40c8ff';              // void teal accent
-const VA  = '#ffffff';              // absolute white
+const VP = "#9060ff"; // void purple
+const VL = "#c8a8ff"; // void lavender
+const VW = "#f0e8ff"; // void white-violet
+const VD = "#1a0040"; // void deep
+const VB = "#6040e0"; // void blue-purple
+const VT = "#40c8ff"; // void teal accent
+const VA = "#ffffff"; // absolute white
 
-const VP_GLOW  = 'rgba(144,96,255,0.95)';
-const VL_GLOW  = 'rgba(200,168,255,0.85)';
-const VT_GLOW  = 'rgba(64,200,255,0.8)';
+const VP_GLOW = "rgba(144,96,255,0.95)";
+const VL_GLOW = "rgba(200,168,255,0.85)";
+const VT_GLOW = "rgba(64,200,255,0.8)";
 
 // Shard / nebula / star colors
-const VOID_PALETTE = [VA, VL, VP, VB, VT, '#ff80ff', '#80a0ff', '#ffd0ff'];
+const VOID_PALETTE = [VA, VL, VP, VB, VT, "#ff80ff", "#80a0ff", "#ffd0ff"];
 
 // Void-consciousness symbols — esoteric Unicode, no specific religion
-const VOID_SYMBOLS = ['⊗', '◉', '⊕', '○', '◈', '⊖', '◎', '⊙', '⊘', '◊'];
+const VOID_SYMBOLS = ["⊗", "◉", "⊕", "○", "◈", "⊖", "◎", "⊙", "⊘", "◊"];
 
 // ── CSS ───────────────────────────────────────────────────────
 const CSS = `
@@ -392,72 +395,88 @@ body.va-detonation { animation:vaBodyDetonation 1.2s ease-out; }
 `;
 
 function injectCSS() {
-  if (document.getElementById('va-styles')) return;
-  const s = document.createElement('style');
-  s.id = 'va-styles';
+  if (document.getElementById("va-styles")) return;
+  const s = document.createElement("style");
+  s.id = "va-styles";
   s.textContent = CSS;
   document.head.appendChild(s);
 }
 
 function mk(cls) {
-  const el = document.createElement('div');
+  const el = document.createElement("div");
   el.className = cls;
   return el;
 }
 
 let _spawned = [];
-function spawn(el)    { _spawned.push(el); document.body.appendChild(el); return el; }
-function killSpawned(){ _spawned.forEach(e => e.remove()); _spawned = []; }
-function rnd(a, b)    { return a + Math.random() * (b - a); }
-function rndInt(a, b) { return Math.floor(rnd(a, b + 1)); }
+function spawn(el) {
+  _spawned.push(el);
+  document.body.appendChild(el);
+  return el;
+}
+function killSpawned() {
+  _spawned.forEach((e) => e.remove());
+  _spawned = [];
+}
+function rnd(a, b) {
+  return a + Math.random() * (b - a);
+}
+function rndInt(a, b) {
+  return Math.floor(rnd(a, b + 1));
+}
 
 // ══════════════════════════════════════════════════════════════
 export class VoidAwakens {
   constructor(engine, rarity) {
-    this.engine   = engine;
-    this.rarity   = rarity;
-    this.stopped  = false;
-    this._timers  = [];
-    this._actx    = null;
-    this._singEl  = null;
-    this._eyeEl   = null;
+    this.engine = engine;
+    this.rarity = rarity;
+    this.stopped = false;
+    this._timers = [];
+    this._actx = null;
+    this._singEl = null;
+    this._eyeEl = null;
     this.fx = {
       shakeIntensity: 72,
-      particleCount:  270,
-      rayCount:       52,
-      glowMaxAlpha:   0.96,
-      auraCount:      8,
-      trailEnabled:   true,
-      tendrilCount:   24,
-      shardCount:     90,
-      starCount:      120,
-      symbolCount:    10,
+      particleCount: 270,
+      rayCount: 52,
+      glowMaxAlpha: 0.96,
+      auraCount: 8,
+      trailEnabled: true,
+      tendrilCount: 24,
+      shardCount: 90,
+      starCount: 120,
+      symbolCount: 10,
       ...(rarity.effects ?? {}),
     };
     injectCSS();
   }
 
   _after(ms, fn) {
-    const id = setTimeout(() => { if (!this.stopped) fn(); }, ms);
+    const id = setTimeout(() => {
+      if (!this.stopped) fn();
+    }, ms);
     this._timers.push(id);
     return id;
   }
 
   play() {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       _spawned = [];
 
       // ── Phase 0: Blackout ───────────────────────────────────
-      const voidEl = spawn(mk('va-void'));
-      this._after(14500, () => voidEl.classList.add('va-void--fade'));
+      const voidEl = spawn(mk("va-void"));
+      this._after(14500, () => voidEl.classList.add("va-void--fade"));
       this._after(16800, () => voidEl.remove());
 
       // ── Phase 1: Singularity ────────────────────────────────
       this._after(300, () => {
-        const sing = spawn(mk('va-singularity'));
+        const sing = spawn(mk("va-singularity"));
         this._singEl = sing;
         this._sfxSingularity();
-        this._after(5600, () => { sing.remove(); this._singEl = null; });
+        this._after(5600, () => {
+          sing.remove();
+          this._singEl = null;
+        });
       });
 
       // ── Phase 2: Void tendrils ──────────────────────────────
@@ -470,23 +489,24 @@ export class VoidAwakens {
       this._after(1100, () => {
         this._spawnCracks();
         this._sfxCrack();
-        document.body.classList.add('va-shake');
-        this._after(600, () => document.body.classList.remove('va-shake'));
+        document.body.classList.add("va-shake");
+        this._after(600, () => document.body.classList.remove("va-shake"));
       });
 
       // ── Phase 4: Gravitational collapse ─────────────────────
       this._after(1650, () => {
         // Singularity disappears as gravity swallows it
         if (this._singEl) {
-          this._singEl.style.transition = 'transform .35s ease-in, opacity .3s ease-in';
-          this._singEl.style.opacity = '0';
+          this._singEl.style.transition =
+            "transform .35s ease-in, opacity .3s ease-in";
+          this._singEl.style.opacity = "0";
         }
 
-        const grav = spawn(mk('va-gravity'));
+        const grav = spawn(mk("va-gravity"));
         this._after(620, () => grav.remove());
 
-        document.body.classList.add('va-heavy');
-        this._after(940, () => document.body.classList.remove('va-heavy'));
+        document.body.classList.add("va-heavy");
+        this._after(940, () => document.body.classList.remove("va-heavy"));
         this.engine.shake(this.fx.shakeIntensity * 0.6);
         this._sfxCollapse();
       });
@@ -494,34 +514,39 @@ export class VoidAwakens {
       // ── Phase 5: DETONATION ─────────────────────────────────
       this._after(2300, () => {
         // White flash
-        const det = spawn(mk('va-detonation'));
+        const det = spawn(mk("va-detonation"));
         this._after(650, () => det.remove());
 
         // Chromatic fringe
-        const chroma = spawn(mk('va-chroma'));
+        const chroma = spawn(mk("va-chroma"));
         this._after(750, () => chroma.remove());
 
         // Eye of the Void
-        const eye = spawn(mk('va-eye'));
+        const eye = spawn(mk("va-eye"));
         this._eyeEl = eye;
-        this._after(5800, () => { eye.remove(); this._eyeEl = null; });
+        this._after(5800, () => {
+          eye.remove();
+          this._eyeEl = null;
+        });
 
         // 9 awakening rings — staggered, cycling colors
         const ringCols = [VA, VW, VL, VP, VB, VT, VW, VL, VA];
         ringCols.forEach((col, i) => {
           this._after(i * 65, () => {
-            const ring = spawn(mk('va-ring'));
+            const ring = spawn(mk("va-ring"));
             ring.style.cssText += `
               border:3px solid ${col};
               box-shadow:0 0 12px ${col};
-              animation-duration:${.9 + i * .14}s;
+              animation-duration:${0.9 + i * 0.14}s;
             `;
             this._after(1400, () => ring.remove());
           });
         });
 
-        document.body.classList.add('va-detonation');
-        this._after(1250, () => document.body.classList.remove('va-detonation'));
+        document.body.classList.add("va-detonation");
+        this._after(1250, () =>
+          document.body.classList.remove("va-detonation"),
+        );
         this.engine.shake(this.fx.shakeIntensity);
         this._sfxDetonation();
       });
@@ -542,113 +567,131 @@ export class VoidAwakens {
       // ── Phase 9: Canvas effects ─────────────────────────────
       this._after(6400, () => {
         // Multi-layer ray bursts: violet primary, white accent, teal cool
-        [[VP, 0.17, 0.7], [VW, 0.11, -1.0], [VB, 0.09, 1.5], [VT, 0.07, -0.6], [VA, 0.04, 2.1]].forEach(([col, alpha, rot], i) => {
+        [
+          [VP, 0.17, 0.7],
+          [VW, 0.11, -1.0],
+          [VB, 0.09, 1.5],
+          [VT, 0.07, -0.6],
+          [VA, 0.04, 2.1],
+        ].forEach(([col, alpha, rot], i) => {
           this._after(i * 120, () => {
-            this.engine.addEffect(new RayBurst({
-              color:    col,
-              duration: 11000,
-              maxAlpha: alpha,
-              rayCount: Math.floor(this.fx.rayCount * (1 - i * 0.15)),
-              rotSpeed: rot,
-            }));
+            this.engine.addEffect(
+              new RayBurst({
+                color: col,
+                duration: 11000,
+                maxAlpha: alpha,
+                rayCount: Math.floor(this.fx.rayCount * (1 - i * 0.15)),
+                rotSpeed: rot,
+              }),
+            );
           });
         });
 
         // Deep violet glow overlay
-        this.engine.addEffect(new GlowOverlay({
-          color:      VP_GLOW,
-          duration:   10000,
-          maxAlpha:   this.fx.glowMaxAlpha,
-          fadeIn:     0.04,
-          fadeOut:    0.18,
-          radial:     true,
-          pulseSpeed: 1.9,
-        }));
+        this.engine.addEffect(
+          new GlowOverlay({
+            color: VP_GLOW,
+            duration: 10000,
+            maxAlpha: this.fx.glowMaxAlpha,
+            fadeIn: 0.04,
+            fadeOut: 0.18,
+            radial: true,
+            pulseSpeed: 1.9,
+          }),
+        );
 
         // Particle storm — all void palette colors
         VOID_PALETTE.forEach((col, i) => {
           this._after(i * 130, () => {
-            this.engine.addEffect(new ParticleBurst(0.5, 0.5, {
-              count:    Math.floor(this.fx.particleCount * (.5 + i * .07)),
-              color:    col,
-              minSpeed: 105 + i * 60,
-              maxSpeed: 390 + i * 55,
-              minSize:  2,
-              maxSize:  9,
-              gravity:  32,
-              trail:    this.fx.trailEnabled,
-              glow:     true,
-              duration: 7000,
-              type:     i % 3 === 0 ? 'star' : 'spark',
-            }));
+            this.engine.addEffect(
+              new ParticleBurst(0.5, 0.5, {
+                count: Math.floor(this.fx.particleCount * (0.5 + i * 0.07)),
+                color: col,
+                minSpeed: 105 + i * 60,
+                maxSpeed: 390 + i * 55,
+                minSize: 2,
+                maxSize: 9,
+                gravity: 32,
+                trail: this.fx.trailEnabled,
+                glow: true,
+                duration: 7000,
+                type: i % 3 === 0 ? "star" : "spark",
+              }),
+            );
           });
         });
 
         // Void essence rising from center
-        this.engine.addEffect(new ContinuousParticles({
-          ox:        0.5,
-          oy:        0.5,
-          color:     VL,
-          minSpeed:  55,
-          maxSpeed:  225,
-          gravity:   -60,
-          upBias:    130,
-          spread:    Math.PI * 2,
-          minSize:   1.5,
-          maxSize:   6,
-          trail:     true,
-          glow:      true,
-          spawnRate: 0.03,
-          duration:  9500,
-          type:      'star',
-        }));
+        this.engine.addEffect(
+          new ContinuousParticles({
+            ox: 0.5,
+            oy: 0.5,
+            color: VL,
+            minSpeed: 55,
+            maxSpeed: 225,
+            gravity: -60,
+            upBias: 130,
+            spread: Math.PI * 2,
+            minSize: 1.5,
+            maxSize: 6,
+            trail: true,
+            glow: true,
+            spawnRate: 0.03,
+            duration: 9500,
+            type: "star",
+          }),
+        );
 
         // Void tendrils of teal from edges
-        this.engine.addEffect(new ContinuousParticles({
-          ox:        w => Math.random() < 0.5 ? 0 : w,
-          oy:        h => Math.random() * h,
-          color:     VT,
-          minSpeed:  35,
-          maxSpeed:  110,
-          gravity:   -10,
-          spread:    Math.PI * 0.4,
-          angle:     Math.PI,
-          minSize:   1.5,
-          maxSize:   4,
-          trail:     true,
-          glow:      true,
-          spawnRate: 0.016,
-          duration:  9000,
-        }));
+        this.engine.addEffect(
+          new ContinuousParticles({
+            ox: (w) => (Math.random() < 0.5 ? 0 : w),
+            oy: (h) => Math.random() * h,
+            color: VT,
+            minSpeed: 35,
+            maxSpeed: 110,
+            gravity: -10,
+            spread: Math.PI * 0.4,
+            angle: Math.PI,
+            minSize: 1.5,
+            maxSize: 4,
+            trail: true,
+            glow: true,
+            spawnRate: 0.016,
+            duration: 9000,
+          }),
+        );
 
         // White starfall from above
-        this.engine.addEffect(new ContinuousParticles({
-          ox:        w => Math.random() * w,
-          oy:        0,
-          color:     VA,
-          minSpeed:  45,
-          maxSpeed:  140,
-          gravity:   85,
-          spread:    0.4,
-          angle:     Math.PI / 2,
-          minSize:   1,
-          maxSize:   3,
-          trail:     false,
-          glow:      true,
-          spawnRate: 0.024,
-          duration:  8500,
-        }));
+        this.engine.addEffect(
+          new ContinuousParticles({
+            ox: (w) => Math.random() * w,
+            oy: 0,
+            color: VA,
+            minSpeed: 45,
+            maxSpeed: 140,
+            gravity: 85,
+            spread: 0.4,
+            angle: Math.PI / 2,
+            minSize: 1,
+            maxSize: 3,
+            trail: false,
+            glow: true,
+            spawnRate: 0.024,
+            duration: 8500,
+          }),
+        );
       });
 
       // ── Phase 10: VOID AWAKENS label + aura rings ───────────
       this._after(7600, () => {
-        const label = spawn(mk('va-label'));
-        const main  = document.createElement('div');
-        main.className   = 'va-label-main';
-        main.textContent = 'VOID AWAKENS';
-        const sub   = document.createElement('div');
-        sub.className    = 'va-label-sub';
-        sub.textContent  = '◉  1 / 125,000  ·  THE SINGULARITY  ◉';
+        const label = spawn(mk("va-label"));
+        const main = document.createElement("div");
+        main.className = "va-label-main";
+        main.textContent = "VOID AWAKENS";
+        const sub = document.createElement("div");
+        sub.className = "va-label-sub";
+        sub.textContent = "◉  1 / 125,000  ·  THE SINGULARITY  ◉";
         label.appendChild(main);
         label.appendChild(sub);
         this._after(8000, () => label.remove());
@@ -657,15 +700,15 @@ export class VoidAwakens {
         const auraCols = [VP, VT, VL, VB, VA, VP, VT, VW];
         for (let i = 0; i < this.fx.auraCount; i++) {
           this._after(i * 195, () => {
-            const aura = spawn(mk('va-aura'));
-            const sz   = 95 + i * 68;
-            const col  = auraCols[i % auraCols.length];
+            const aura = spawn(mk("va-aura"));
+            const sz = 95 + i * 68;
+            const col = auraCols[i % auraCols.length];
             const col2 = auraCols[(i + 3) % auraCols.length];
             aura.style.cssText = `
               width:${sz}px;height:${sz}px;
               background:radial-gradient(circle,${col}44 0%,${col}18 55%,transparent 80%);
-              box-shadow:0 0 ${28+i*13}px ${col},0 0 ${60+i*24}px ${col2}55;
-              animation-duration:${2+i*.32}s;
+              box-shadow:0 0 ${28 + i * 13}px ${col},0 0 ${60 + i * 24}px ${col2}55;
+              animation-duration:${2 + i * 0.32}s;
             `;
             this._after(3400, () => aura.remove());
           });
@@ -678,7 +721,11 @@ export class VoidAwakens {
       // ── Phase 13: Resolve ────────────────────────────────────
       this._after(20000, () => {
         killSpawned();
-        if (this._actx) { try { this._actx.close(); } catch(e){} }
+        if (this._actx) {
+          try {
+            this._actx.close();
+          } catch (e) {}
+        }
         resolve();
       });
     });
@@ -688,19 +735,23 @@ export class VoidAwakens {
     this.stopped = true;
     this._timers.forEach(clearTimeout);
     this._timers = [];
-    document.body.classList.remove('va-shake', 'va-heavy', 'va-detonation');
-    if (this._actx) { try { this._actx.close(); } catch(e){} }
+    document.body.classList.remove("va-shake", "va-heavy", "va-detonation");
+    if (this._actx) {
+      try {
+        this._actx.close();
+      } catch (e) {}
+    }
     killSpawned();
   }
 
   // ── 24 void tendrils crawl outward from center ─────────────
   _spawnTendrils(count) {
     for (let i = 0; i < count; i++) {
-      const t   = spawn(mk('va-tendril'));
+      const t = spawn(mk("va-tendril"));
       const ang = (360 / count) * i + rnd(-5, 5);
-      const len = rnd(14, 34);   // vh
+      const len = rnd(14, 34); // vh
       const dur = rnd(0.55, 0.95);
-      const wv  = rnd(0.4, 1.6);
+      const wv = rnd(0.4, 1.6);
       const wid = rnd(1.2, 2.8);
       const col = i % 4 === 0 ? VT : VP;
       t.style.cssText = `
@@ -708,7 +759,7 @@ export class VoidAwakens {
         --ta:${ang}deg;--tl:${len}vh;--tw:${wv};
         height:${len}vh;width:${wid}px;
         animation-duration:${dur}s;
-        animation-delay:${Math.random()*0.15}s;
+        animation-delay:${Math.random() * 0.15}s;
         background:linear-gradient(to top,
           ${col}ee 0%,rgba(160,100,255,.55) 55%,transparent 100%);
         filter:blur(.5px);
@@ -720,47 +771,57 @@ export class VoidAwakens {
 
   // ── SVG fractal crack lattice ────────────────────────────────
   _spawnCracks() {
-    const layer = spawn(mk('va-crack-layer'));
-    const svg   = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('viewBox', '0 0 100 100');
-    svg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;overflow:visible';
+    const layer = spawn(mk("va-crack-layer"));
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 100 100");
+    svg.style.cssText =
+      "position:absolute;inset:0;width:100%;height:100%;overflow:visible";
 
     const origin = { x: 50, y: 50 };
     const crackCount = 10;
 
     const addPath = (pts, delayS) => {
-      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      path.setAttribute('d', 'M ' + pts.map(p => `${p.x} ${p.y}`).join(' L '));
-      path.style.setProperty('--cd', delayS + 's');
+      const path = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "path",
+      );
+      path.setAttribute(
+        "d",
+        "M " + pts.map((p) => `${p.x} ${p.y}`).join(" L "),
+      );
+      path.style.setProperty("--cd", delayS + "s");
       svg.appendChild(path);
     };
 
     const addNode = (vx, vy, delayS) => {
-      const node = spawn(mk('va-crack-node'));
-      node.style.left = vx + 'vw';
-      node.style.top  = vy + 'vh';
-      node.style.setProperty('--cn', delayS + 's');
+      const node = spawn(mk("va-crack-node"));
+      node.style.left = vx + "vw";
+      node.style.top = vy + "vh";
+      node.style.setProperty("--cn", delayS + "s");
       this._after(700, () => node.remove());
     };
 
     for (let c = 0; c < crackCount; c++) {
       const baseAngle = (360 / crackCount) * c + rnd(-18, 18);
-      const baseRad   = baseAngle * Math.PI / 180;
-      const steps     = rndInt(5, 9);
-      let pts         = [{ ...origin }];
-      let cx = origin.x, cy = origin.y;
+      const baseRad = (baseAngle * Math.PI) / 180;
+      const steps = rndInt(5, 9);
+      let pts = [{ ...origin }];
+      let cx = origin.x,
+        cy = origin.y;
 
       for (let s = 0; s < steps; s++) {
-        const jitter = rnd(-22, 22) * Math.PI / 180;
-        const dist   = rnd(3.5, 8);
+        const jitter = (rnd(-22, 22) * Math.PI) / 180;
+        const dist = rnd(3.5, 8);
         cx += Math.cos(baseRad + jitter) * dist;
         cy += Math.sin(baseRad + jitter) * dist;
         pts.push({ x: cx, y: cy });
 
         // Branching at mid-crack
         if (s === 2 && Math.random() > 0.35) {
-          const branchRad = baseRad + (Math.random() > 0.5 ? 1 : -1) * (Math.PI / 4.5);
-          let bx = cx, by = cy;
+          const branchRad =
+            baseRad + (Math.random() > 0.5 ? 1 : -1) * (Math.PI / 4.5);
+          let bx = cx,
+            by = cy;
           const bPts = [{ x: bx, y: by }];
           for (let b = 0; b < rndInt(2, 3); b++) {
             bx += Math.cos(branchRad) * rnd(3, 6);
@@ -783,8 +844,8 @@ export class VoidAwakens {
   // ── 90 void shards erupt ─────────────────────────────────────
   _spawnShards(count) {
     for (let i = 0; i < count; i++) {
-      const sh  = spawn(mk('va-shard'));
-      const sz  = rnd(2, 8);
+      const sh = spawn(mk("va-shard"));
+      const sz = rnd(2, 8);
       const ang = Math.random() * 360;
       const rad = rnd(18, 52);
       const dur = rnd(0.55, 1.4);
@@ -793,10 +854,10 @@ export class VoidAwakens {
         left:50vw;top:50vh;
         width:${sz}px;height:${sz}px;
         background:${col};
-        box-shadow:0 0 ${sz*2}px ${sz}px ${col}cc;
+        box-shadow:0 0 ${sz * 2}px ${sz}px ${col}cc;
         --sa:${ang}deg;--sr:${rad}vmin;
         animation-duration:${dur}s;
-        animation-delay:${Math.random()*0.18}s;
+        animation-delay:${Math.random() * 0.18}s;
       `;
       this._after((dur + 0.35) * 1000, () => sh.remove());
     }
@@ -804,14 +865,14 @@ export class VoidAwakens {
 
   // ── Nebula flood ─────────────────────────────────────────────
   _spawnNebula() {
-    const neb = spawn(mk('va-nebula'));
+    const neb = spawn(mk("va-nebula"));
     neb.style.background = `
       radial-gradient(ellipse at 38% 44%,${VT}55 0%,rgba(40,100,255,.2) 38%,transparent 68%),
       radial-gradient(ellipse at 72% 36%,${VP}44 0%,rgba(80,20,180,.18) 52%,transparent 80%),
       radial-gradient(ellipse at 50% 72%,${VL}33 0%,rgba(160,100,255,.12) 55%,transparent 85%),
       radial-gradient(ellipse at 20% 68%,${VB}33 0%,transparent 58%)
     `;
-    neb.style.animationDuration = '4.5s';
+    neb.style.animationDuration = "4.5s";
     this._after(5000, () => neb.remove());
   }
 
@@ -819,16 +880,16 @@ export class VoidAwakens {
   _spawnStars(count) {
     for (let i = 0; i < count; i++) {
       this._after(Math.random() * 700, () => {
-        const star = spawn(mk('va-star'));
-        const sz   = rnd(1, 5);
-        const dur  = rnd(0.6, 1.2);
-        const col  = Math.random() > 0.55 ? VL : VA;
+        const star = spawn(mk("va-star"));
+        const sz = rnd(1, 5);
+        const dur = rnd(0.6, 1.2);
+        const col = Math.random() > 0.55 ? VL : VA;
         star.style.cssText = `
-          left:${Math.random()*100}vw;
-          top:${Math.random()*100}vh;
+          left:${Math.random() * 100}vw;
+          top:${Math.random() * 100}vh;
           width:${sz}px;height:${sz}px;
           background:${col};
-          box-shadow:0 0 ${sz*3}px ${sz}px ${col}dd;
+          box-shadow:0 0 ${sz * 3}px ${sz}px ${col}dd;
           --ss:${1 + Math.random()};
           animation-duration:${dur}s;
         `;
@@ -840,13 +901,13 @@ export class VoidAwakens {
   // ── 10 void-consciousness symbols orbit center ───────────────
   _spawnSymbols(count) {
     for (let i = 0; i < count; i++) {
-      const sym = spawn(mk('va-symbol'));
+      const sym = spawn(mk("va-symbol"));
       sym.textContent = VOID_SYMBOLS[i % VOID_SYMBOLS.length];
-      const orbitR  = rnd(120, 200);   // px
+      const orbitR = rnd(120, 200); // px
       const startAng = (360 / count) * i;
-      const endAng   = startAng + (Math.random() > 0.5 ? 360 : -360);
+      const endAng = startAng + (Math.random() > 0.5 ? 360 : -360);
       const orbitDur = rnd(5, 9);
-      const fadeDur  = rnd(3.5, 5.5);
+      const fadeDur = rnd(3.5, 5.5);
       const fontSize = rnd(18, 32);
       sym.style.cssText += `
         font-size:${fontSize}px;
@@ -859,10 +920,10 @@ export class VoidAwakens {
 
   // ── "ALL THAT EXISTS WAS ONCE NOTHING." typewriter ───────────
   _spawnTypewriter() {
-    const el   = spawn(mk('va-typewriter'));
-    const TEXT = 'ALL THAT EXISTS WAS ONCE NOTHING.';
-    const cur  = document.createElement('span');
-    cur.className = 'va-cursor';
+    const el = spawn(mk("va-typewriter"));
+    const TEXT = "ALL THAT EXISTS WAS ONCE NOTHING.";
+    const cur = document.createElement("span");
+    cur.className = "va-cursor";
     el.appendChild(cur);
 
     let idx = 0;
@@ -872,8 +933,10 @@ export class VoidAwakens {
         el.insertBefore(document.createTextNode(TEXT[idx]), cur);
         idx++;
         if (idx % 4 === 0) this._sfxType();
-        const delay = 72 + (TEXT[idx - 1] === '.' ? 360 : TEXT[idx - 1] === ' ' ? 90 : 0)
-                        + (Math.random() > .9 ? 140 : 0);
+        const delay =
+          72 +
+          (TEXT[idx - 1] === "." ? 360 : TEXT[idx - 1] === " " ? 90 : 0) +
+          (Math.random() > 0.9 ? 140 : 0);
         this._timers.push(setTimeout(type, delay));
       } else {
         this._sfxStarBurst();
@@ -891,144 +954,174 @@ export class VoidAwakens {
 
   _audio() {
     if (!this._actx) {
-      try { this._actx = new (window.AudioContext || window.webkitAudioContext)(); }
-      catch(e) { return null; }
+      try {
+        this._actx = new (window.AudioContext || window.webkitAudioContext)();
+      } catch (e) {
+        return null;
+      }
     }
-    if (this._actx.state === 'suspended') this._actx.resume();
+    if (this._actx.state === "suspended") this._actx.resume();
     return this._actx;
   }
 
-  _tone(ctx, startOffset, freq, dur, vol = 0.16, type = 'sine') {
+  _tone(ctx, startOffset, freq, dur, vol = 0.16, type = "sine") {
     try {
-      const osc  = ctx.createOscillator();
+      const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.type = type; osc.frequency.value = freq;
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = type;
+      osc.frequency.value = freq;
       const t = ctx.currentTime + startOffset;
       gain.gain.setValueAtTime(vol, t);
       gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-      osc.start(t); osc.stop(t + dur + 0.01);
-    } catch(e) {}
+      osc.start(t);
+      osc.stop(t + dur + 0.01);
+    } catch (e) {}
   }
 
-  _glide(ctx, startOffset, f0, f1, dur, vol = 0.14, type = 'sine') {
+  _glide(ctx, startOffset, f0, f1, dur, vol = 0.14, type = "sine") {
     try {
-      const osc  = ctx.createOscillator();
+      const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.connect(gain); gain.connect(ctx.destination);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
       osc.type = type;
       const t = ctx.currentTime + startOffset;
       osc.frequency.setValueAtTime(f0, t);
       osc.frequency.exponentialRampToValueAtTime(f1, t + dur);
       gain.gain.setValueAtTime(vol, t);
       gain.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.04);
-      osc.start(t); osc.stop(t + dur + 0.06);
-    } catch(e) {}
+      osc.start(t);
+      osc.stop(t + dur + 0.06);
+    } catch (e) {}
   }
 
   _noise(ctx, startOffset, dur, vol = 0.25, cutoff = 350) {
     try {
       const bufSize = Math.ceil(ctx.sampleRate * dur);
-      const buffer  = ctx.createBuffer(1, bufSize, ctx.sampleRate);
-      const data    = buffer.getChannelData(0);
+      const buffer = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
       for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
-      const src    = ctx.createBufferSource(); src.buffer = buffer;
+      const src = ctx.createBufferSource();
+      src.buffer = buffer;
       const filter = ctx.createBiquadFilter();
-      filter.type  = 'lowpass'; filter.frequency.value = cutoff;
-      const gain   = ctx.createGain();
-      src.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+      filter.type = "lowpass";
+      filter.frequency.value = cutoff;
+      const gain = ctx.createGain();
+      src.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
       const t = ctx.currentTime + startOffset;
       gain.gain.setValueAtTime(vol, t);
       gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-      src.start(t); src.stop(t + dur + 0.01);
-    } catch(e) {}
+      src.start(t);
+      src.stop(t + dur + 0.01);
+    } catch (e) {}
   }
 
   // 1. Singularity birth — high shimmer, trembling overtones
   _sfxSingularity() {
-    const ctx = this._audio(); if (!ctx) return;
+    const ctx = this._audio();
+    if (!ctx) return;
     // High-frequency shimmer building up
-    this._glide(ctx, 0,   1800, 2400, 0.8,  0.08, 'sine');
-    this._glide(ctx, 0,   900,  1200, 0.8,  0.05, 'sine');
-    this._tone(ctx,  ctx.currentTime, 4186, 1.2,  0.04, 'sine'); // C8 shimmer
+    this._glide(ctx, 0, 1800, 2400, 0.8, 0.08, "sine");
+    this._glide(ctx, 0, 900, 1200, 0.8, 0.05, "sine");
+    this._tone(ctx, ctx.currentTime, 4186, 1.2, 0.04, "sine"); // C8 shimmer
     // Very soft sub-bass pulse
-    this._tone(ctx,  ctx.currentTime + 0.3, 40, 0.5, 0.1, 'sine');
+    this._tone(ctx, ctx.currentTime + 0.3, 40, 0.5, 0.1, "sine");
   }
 
   // 2. Tendrils drone — descending menacing low swell
   _sfxDrone() {
-    const ctx = this._audio(); if (!ctx) return;
-    this._glide(ctx, 0,   100, 28,  2.0,  0.18, 'sawtooth');
-    this._glide(ctx, 0,   200, 55,  1.8,  0.09, 'sine');
-    this._glide(ctx, 0.4, 350, 45,  1.4,  0.05, 'triangle');
+    const ctx = this._audio();
+    if (!ctx) return;
+    this._glide(ctx, 0, 100, 28, 2.0, 0.18, "sawtooth");
+    this._glide(ctx, 0, 200, 55, 1.8, 0.09, "sine");
+    this._glide(ctx, 0.4, 350, 45, 1.4, 0.05, "triangle");
   }
 
   // 3. Reality crack — sharp noise burst + metallic zing
   _sfxCrack() {
-    const ctx = this._audio(); if (!ctx) return;
-    this._noise(ctx, 0,    0.18, 0.28, 700);
-    this._noise(ctx, 0,    0.08, 0.18, 4000);
-    this._glide(ctx, 0,   3200, 200,  0.3, 0.12, 'sawtooth');
+    const ctx = this._audio();
+    if (!ctx) return;
+    this._noise(ctx, 0, 0.18, 0.28, 700);
+    this._noise(ctx, 0, 0.08, 0.18, 4000);
+    this._glide(ctx, 0, 3200, 200, 0.3, 0.12, "sawtooth");
   }
 
   // 4. Gravitational collapse — deep descending implosion
   _sfxCollapse() {
-    const ctx = this._audio(); if (!ctx) return;
-    this._noise(ctx, 0,    0.25, 0.35, 500);
-    this._glide(ctx, 0,    500,  35,   0.55, 0.22, 'sawtooth');
-    this._tone(ctx,  ctx.currentTime, 65, 0.7, 0.18, 'sine');
-    this._tone(ctx,  ctx.currentTime, 33, 0.6, 0.12, 'sine');
+    const ctx = this._audio();
+    if (!ctx) return;
+    this._noise(ctx, 0, 0.25, 0.35, 500);
+    this._glide(ctx, 0, 500, 35, 0.55, 0.22, "sawtooth");
+    this._tone(ctx, ctx.currentTime, 65, 0.7, 0.18, "sine");
+    this._tone(ctx, ctx.currentTime, 33, 0.6, 0.12, "sine");
   }
 
   // 5. Detonation — the biggest sound in the game
   _sfxDetonation() {
-    const ctx = this._audio(); if (!ctx) return;
-    this._noise(ctx, 0,    0.7,  0.55, 180);   // low boom body
-    this._noise(ctx, 0,    0.28, 0.4,  2200);  // high transient crack
-    this._noise(ctx, 0.35, 0.5,  0.22, 9000);  // hiss tail
-    this._tone(ctx,  ctx.currentTime,      45,   1.0, 0.32, 'sine');   // sub thud
-    this._tone(ctx,  ctx.currentTime,      90,   0.8, 0.18, 'sine');   // octave
-    this._glide(ctx, 0.08, 1200, 80,   0.85, 0.16, 'sawtooth');       // sweep down
+    const ctx = this._audio();
+    if (!ctx) return;
+    this._noise(ctx, 0, 0.7, 0.55, 180); // low boom body
+    this._noise(ctx, 0, 0.28, 0.4, 2200); // high transient crack
+    this._noise(ctx, 0.35, 0.5, 0.22, 9000); // hiss tail
+    this._tone(ctx, ctx.currentTime, 45, 1.0, 0.32, "sine"); // sub thud
+    this._tone(ctx, ctx.currentTime, 90, 0.8, 0.18, "sine"); // octave
+    this._glide(ctx, 0.08, 1200, 80, 0.85, 0.16, "sawtooth"); // sweep down
     // Short mid-range crack zing
-    this._glide(ctx, 0,    4000, 220,  0.3,  0.1,  'square');
+    this._glide(ctx, 0, 4000, 220, 0.3, 0.1, "square");
   }
 
   // 6. Universe awakening — ascending harmonic choir swell
   _sfxAwakening() {
-    const ctx = this._audio(); if (!ctx) return;
+    const ctx = this._audio();
+    if (!ctx) return;
     const t = ctx.currentTime;
     // C minor → E♭ → G → B♭ → C — ascending resolution
     const choir = [
-      [131, 0.00, 1.4, 0.10],
-      [155, 0.10, 1.3, 0.09],
-      [196, 0.20, 1.2, 0.09],
-      [233, 0.30, 1.1, 0.08],
-      [262, 0.42, 1.0, 0.10],
+      [131, 0.0, 1.4, 0.1],
+      [155, 0.1, 1.3, 0.09],
+      [196, 0.2, 1.2, 0.09],
+      [233, 0.3, 1.1, 0.08],
+      [262, 0.42, 1.0, 0.1],
       [311, 0.52, 0.9, 0.09],
       [392, 0.62, 0.8, 0.09],
       [466, 0.72, 0.7, 0.08],
       [523, 0.82, 0.8, 0.12],
     ];
-    choir.forEach(([f, off, dur, vol]) => this._tone(ctx, t + off, f, dur, vol, 'sine'));
+    choir.forEach(([f, off, dur, vol]) =>
+      this._tone(ctx, t + off, f, dur, vol, "sine"),
+    );
     // Shimmer overtones
     [1047, 1319, 1568].forEach((f, i) => {
-      this._tone(ctx, t + 0.5 + i * 0.08, f, 0.8, 0.04, 'sine');
+      this._tone(ctx, t + 0.5 + i * 0.08, f, 0.8, 0.04, "sine");
     });
   }
 
   // 7. Typewriter — soft void tone
   _sfxType() {
-    const ctx = this._audio(); if (!ctx) return;
+    const ctx = this._audio();
+    if (!ctx) return;
     const freqs = [392, 440, 494, 392, 330];
-    this._tone(ctx, ctx.currentTime, freqs[Math.floor(Math.random() * freqs.length)], 0.06, 0.06, 'sine');
+    this._tone(
+      ctx,
+      ctx.currentTime,
+      freqs[Math.floor(Math.random() * freqs.length)],
+      0.06,
+      0.06,
+      "sine",
+    );
   }
 
   // 8. Completion star burst — shimmering ascent
   _sfxStarBurst() {
-    const ctx = this._audio(); if (!ctx) return;
+    const ctx = this._audio();
+    if (!ctx) return;
     const t = ctx.currentTime;
     [523, 659, 784, 1047, 1319, 1568].forEach((f, i) => {
-      this._tone(ctx, t + i * 0.05, f, 0.1, 0.10, 'sine');
+      this._tone(ctx, t + i * 0.05, f, 0.1, 0.1, "sine");
     });
   }
 }
