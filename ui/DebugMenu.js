@@ -1,5 +1,5 @@
 // ui/DebugMenu.js
-import { RARITIES, RARITY_ORDER } from '../config/RarityConfig.js';
+import { RARITIES, RARITY_ORDER } from "../config/RarityConfig.js";
 
 // Display order: rarest first
 const DISPLAY_ORDER = [...RARITY_ORDER].reverse();
@@ -7,10 +7,12 @@ const DISPLAY_ORDER = [...RARITY_ORDER].reverse();
 function formatOneIn(weight) {
   const total = Object.values(RARITIES).reduce((s, r) => s + r.weight, 0);
   const oneIn = total / weight;
-  if (oneIn < 10) return '1/' + oneIn.toFixed(1);
-  return '1/' + Math.round(oneIn).toLocaleString();
+  if (oneIn < 10) return "1/" + oneIn.toFixed(1);
+  return "1/" + Math.round(oneIn).toLocaleString();
 }
-function getOddsLabel(r) { return r.debugOdds ?? formatOneIn(r.weight); }
+function getOddsLabel(r) {
+  return r.debugOdds ?? formatOneIn(r.weight);
+}
 
 const DEBUG_CSS = `
 #debug-menu {
@@ -323,6 +325,26 @@ const DEBUG_CSS = `
   65% {background:#fff4b8;box-shadow:0 0 18px #fff4b8,0 0 45px rgba(255,240,180,.65),0 0 90px rgba(255,200,80,.35);transform:scale(1.45)}
   100%{background:#ff7a00;box-shadow:0 0 14px #ff7a00,0 0 35px rgba(255,120,0,.55);transform:scale(1.2)}
 }
+
+/* NightFall row — night sky, aurora, silver moon */
+.dbg-btn[data-rarity="NIGHTFALL"] {
+  font-family:'Georgia','Times New Roman',serif;font-style:italic;
+  background:linear-gradient(90deg,rgba(136,153,255,.10) 0%,rgba(0,255,136,.04) 55%,transparent 100%);
+}
+.dbg-btn[data-rarity="NIGHTFALL"]:hover {
+  background:linear-gradient(90deg,rgba(136,153,255,.20) 0%,rgba(0,204,255,.08) 55%,transparent 100%);
+}
+.dbg-btn[data-rarity="NIGHTFALL"] .dbg-btn-dot {
+  animation:nfDebugDot 5s ease-in-out infinite alternate;
+}
+@keyframes nfDebugDot {
+  0%  {background:#03030f;box-shadow:0 0 2px rgba(136,153,255,.12);transform:scale(0.6)}
+  20% {background:#8899ff;box-shadow:0 0 8px #8899ff,0 0 20px rgba(136,153,255,.5);transform:scale(1.1)}
+  40% {background:#00ff88;box-shadow:0 0 10px #00ff88,0 0 26px rgba(0,255,136,.55);transform:scale(1.3)}
+  60% {background:#00ccff;box-shadow:0 0 12px #00ccff,0 0 32px rgba(0,204,255,.60);transform:scale(1.4)}
+  80% {background:#c8d8ff;box-shadow:0 0 16px #c8d8ff,0 0 42px rgba(200,216,255,.70),0 0 80px rgba(180,200,255,.35);transform:scale(1.6)}
+  100%{background:#ffffff;box-shadow:0 0 22px #fff,0 0 60px rgba(220,230,255,.85),0 0 140px rgba(200,216,255,.45);transform:scale(1.9)}
+}
 .dbg-util-btn{
   width:calc(100% - 28px);margin:4px 14px;padding:6px 10px;
   background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
@@ -350,29 +372,29 @@ const DEBUG_CSS = `
 
 export class DebugMenu {
   constructor(rollEngine, playerState) {
-    this.rollEngine  = rollEngine;
+    this.rollEngine = rollEngine;
     this.playerState = playerState;
-    this._panel      = null;
-    this._open       = false;
+    this._panel = null;
+    this._open = false;
     this._inject();
     this._render();
     this._bindKeys();
   }
 
   _inject() {
-    if (document.getElementById('dbg-css')) return;
-    const s = document.createElement('style');
-    s.id = 'dbg-css';
+    if (document.getElementById("dbg-css")) return;
+    const s = document.createElement("style");
+    s.id = "dbg-css";
     s.textContent = DEBUG_CSS;
     document.head.appendChild(s);
   }
 
   _render() {
-    const root = document.createElement('div');
-    root.id = 'debug-menu';
+    const root = document.createElement("div");
+    root.id = "debug-menu";
 
-    this._panel = document.createElement('div');
-    this._panel.id = 'debug-panel';
+    this._panel = document.createElement("div");
+    this._panel.id = "debug-panel";
     this._panel.innerHTML = `
       <div class="dbg-header">
         <span class="dbg-title">🔧 Debug</span>
@@ -383,10 +405,13 @@ export class DebugMenu {
         <div class="dbg-section-title">Fire Cutscene</div>
         <div class="dbg-scene-scroll">
           ${DISPLAY_ORDER.map((id, i) => {
-            const r     = RARITIES[id];
-            const odds  = getOddsLabel(r);
-            const badge = r.badge ? `<span class="dbg-btn-badge">${r.badge}</span>` : '';
-            const key   = i < 9 ? `<span class="dbg-btn-key">${i + 1}</span>` : '';
+            const r = RARITIES[id];
+            const odds = getOddsLabel(r);
+            const badge = r.badge
+              ? `<span class="dbg-btn-badge">${r.badge}</span>`
+              : "";
+            const key =
+              i < 9 ? `<span class="dbg-btn-key">${i + 1}</span>` : "";
             return `
               <button class="dbg-btn" data-rarity="${id}" style="--dbg-color:${r.color}">
                 <span class="dbg-btn-dot"></span>
@@ -395,7 +420,7 @@ export class DebugMenu {
                 <span class="dbg-btn-odds">${odds}</span>
               </button>
             `;
-          }).join('')}
+          }).join("")}
           <div class="dbg-scene-fade"></div>
         </div>
       </div>
@@ -415,45 +440,64 @@ export class DebugMenu {
       </div>
     `;
 
-    const toggle = document.createElement('button');
-    toggle.id          = 'debug-toggle';
-    toggle.title       = 'Debug Menu (`)';
-    toggle.textContent = '🔧';
+    const toggle = document.createElement("button");
+    toggle.id = "debug-toggle";
+    toggle.title = "Debug Menu (`)";
+    toggle.textContent = "🔧";
 
     root.appendChild(this._panel);
     root.appendChild(toggle);
     document.body.appendChild(root);
 
-    toggle.addEventListener('click', () => this._togglePanel());
-    this._panel.querySelectorAll('.dbg-btn[data-rarity]').forEach(btn => {
-      btn.addEventListener('click', () => this._fireScene(btn.dataset.rarity));
+    toggle.addEventListener("click", () => this._togglePanel());
+    this._panel.querySelectorAll(".dbg-btn[data-rarity]").forEach((btn) => {
+      btn.addEventListener("click", () => this._fireScene(btn.dataset.rarity));
     });
 
-    document.getElementById('dbg-luck-streak')
-      ?.addEventListener('click', () => { this.rollEngine.activateLuck('streak');  this._toast('🍀 Lucky Streak active'); });
-    document.getElementById('dbg-luck-holy')
-      ?.addEventListener('click', () => { this.rollEngine.activateLuck('holy');    this._toast('✨ Holy Light active'); });
-    document.getElementById('dbg-luck-glimpse')
-      ?.addEventListener('click', () => { this.rollEngine.activateLuck('glimpse'); this._toast('⚡ Glimpse active'); });
-    document.getElementById('dbg-skip')
-      ?.addEventListener('click', () => { this.rollEngine.engine?.cutsceneManager?.stop(); this._toast('Cutscene skipped'); });
-    document.getElementById('dbg-clear-fx')
-      ?.addEventListener('click', () => { this.rollEngine.engine?.clearEffects?.(); this._toast('Effects cleared'); });
-    document.getElementById('dbg-reset')
-      ?.addEventListener('click', () => {
-        if (confirm('Reset all save data?')) { this.playerState.reset(); this._toast('Save reset'); }
+    document
+      .getElementById("dbg-luck-streak")
+      ?.addEventListener("click", () => {
+        this.rollEngine.activateLuck("streak");
+        this._toast("🍀 Lucky Streak active");
       });
+    document.getElementById("dbg-luck-holy")?.addEventListener("click", () => {
+      this.rollEngine.activateLuck("holy");
+      this._toast("✨ Holy Light active");
+    });
+    document
+      .getElementById("dbg-luck-glimpse")
+      ?.addEventListener("click", () => {
+        this.rollEngine.activateLuck("glimpse");
+        this._toast("⚡ Glimpse active");
+      });
+    document.getElementById("dbg-skip")?.addEventListener("click", () => {
+      this.rollEngine.engine?.cutsceneManager?.stop();
+      this._toast("Cutscene skipped");
+    });
+    document.getElementById("dbg-clear-fx")?.addEventListener("click", () => {
+      this.rollEngine.engine?.clearEffects?.();
+      this._toast("Effects cleared");
+    });
+    document.getElementById("dbg-reset")?.addEventListener("click", () => {
+      if (confirm("Reset all save data?")) {
+        this.playerState.reset();
+        this._toast("Save reset");
+      }
+    });
   }
 
   _togglePanel() {
     this._open = !this._open;
-    this._panel.classList.toggle('open', this._open);
+    this._panel.classList.toggle("open", this._open);
   }
 
   _bindKeys() {
-    document.addEventListener('keydown', e => {
-      if (e.key === '`' || e.key === '~') { this._togglePanel(); return; }
-      if (this._open && e.key >= '1' && e.key <= '9') {
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "`" || e.key === "~") {
+        this._togglePanel();
+        return;
+      }
+      if (this._open && e.key >= "1" && e.key <= "9") {
         const id = DISPLAY_ORDER[parseInt(e.key) - 1];
         if (id) this._fireScene(id);
       }
@@ -470,13 +514,14 @@ export class DebugMenu {
     await this.rollEngine.engine.playCutscene(rarity.cutscene, rarity);
     this.rollEngine.rolling = false;
     this._hidePlaying();
-    if (this.rollEngine.onRollComplete) this.rollEngine.onRollComplete(rarity, item);
+    if (this.rollEngine.onRollComplete)
+      this.rollEngine.onRollComplete(rarity, item);
   }
 
   _showPlaying(rarity) {
     this._hidePlaying();
-    const el = document.createElement('div');
-    el.className = 'dbg-playing';
+    const el = document.createElement("div");
+    el.className = "dbg-playing";
     el.innerHTML = `
       <span class="dbg-dot-pulse"></span>
       Playing: <strong style="color:${rarity.color}">${rarity.label}</strong>
@@ -485,10 +530,12 @@ export class DebugMenu {
     this._panel.appendChild(el);
   }
 
-  _hidePlaying() { this._panel.querySelector('.dbg-playing')?.remove(); }
+  _hidePlaying() {
+    this._panel.querySelector(".dbg-playing")?.remove();
+  }
 
   _toast(msg) {
-    const t = document.createElement('div');
+    const t = document.createElement("div");
     t.style.cssText = `
       position:fixed;bottom:80px;right:20px;
       background:rgba(10,10,18,.95);border:1px solid rgba(255,255,255,.12);
@@ -499,7 +546,10 @@ export class DebugMenu {
     `;
     t.textContent = msg;
     document.body.appendChild(t);
-    requestAnimationFrame(() => t.style.opacity = '1');
-    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 250); }, 1800);
+    requestAnimationFrame(() => (t.style.opacity = "1"));
+    setTimeout(() => {
+      t.style.opacity = "0";
+      setTimeout(() => t.remove(), 250);
+    }, 1800);
   }
 }
