@@ -22,11 +22,39 @@ export class RollEngine {
     if (this.rolling) return null;
     this.rolling = true;
 
-    // RarityTable.roll() reads luckSystem.getCurrentLuck() internally,
-    // and calls luckSystem.consumeRoll() after resolving to tick down
-    // roll-based crafted buffs. No manual multiplier wiring needed.
+    // ── Luck snapshot before the roll ────────────────────────────────────────
+    const luck = this.luckSystem.getCurrentLuck();
+    const modifiers = this.luckSystem.getActiveModifiers();
+    const tier = this.luckSystem.getLuckTier();
+
+    if (modifiers.length === 0) {
+    } else {
+      const buffSummary = modifiers
+        .map((m) => {
+          const strength = m.currentStrength.toFixed(2);
+          const status =
+            m.rollsLeft !== null
+              ? `${m.rollsLeft} rolls left`
+              : m.remaining !== null
+                ? `${(m.remaining / 1000).toFixed(1)}s left`
+                : "permanent";
+          return `  • ${m.name}: ×${strength} (${status})`;
+        })
+        .join("\n");
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
     const rarity = this.rarityTable.roll();
     const item = this.rarityTable.rollItem(rarity);
+
+    // Log the result alongside the luck that produced it
+    const totalWeight = this.rarityTable.totalWeight;
+    const baseOneIn = Math.round(totalWeight / rarity.weight);
+    const luckyOneIn = Math.round(baseOneIn / luck);
+    const oddsStr =
+      luck <= 1.01
+        ? `1/${baseOneIn.toLocaleString()}`
+        : `${luck.toFixed(luck % 1 === 0 ? 0 : 2)}/${baseOneIn.toLocaleString()} (≈1/${luckyOneIn.toLocaleString()})`;
 
     this.playerState.recordRoll(rarity, item);
     this.playerState.save();

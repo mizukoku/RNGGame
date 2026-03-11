@@ -1,20 +1,42 @@
 // game/LuckSystem.js
-// Revamped: log compression, roll-count modifiers, hard cap 6.0
-
-/**
- * Central luck pipeline. All luck — time-based buffs AND crafted buffs —
- * flows through here so logarithmic compression and the hard cap always apply.
- *
- * Modifier types:
- *   duration-based  — expires after N milliseconds  (duration: ms, maxRolls: null)
- *   roll-based      — expires after N rolls          (duration: null, maxRolls: N)
- *   permanent       — never expires                  (duration: null, maxRolls: null)
- *
- * Call consumeRoll() once per roll attempt so roll-based modifiers tick down.
- */
-
-const LUCK_CAP = 6.0; // Absolute ceiling — even stacked apex crafts won't break this
-const LOG_SCALE = 1.5; // Controls how aggressively diminishing returns compress bonuses
+// v4 — Pure additive stacking. No compression. No cap.
+//
+// ─── How luck stacks ──────────────────────────────────────────────────────────
+//
+//  luck = sum of all active modifier multipliers (minimum 1.0)
+//
+//  Examples:
+//    No buffs                     →  1x
+//    cosmic_brew (1.6x) active    →  1.6x
+//    nexus_crown (4x) active      →  4x
+//    apex 18x + timed 3x         →  21x   ← what you see IS what you get
+//    dreaming_rebirth (750x) only →  750x
+//    final_verdict (1000x) only   →  1000x
+//
+//  The displayed luck IS the exact multiplier applied to every rarity's base
+//  chance. 21x luck on a 1/1,000,000 aura = 21/1,000,000. Nothing hidden.
+//
+// ─── How luck affects rolls (see RarityTable.js) ─────────────────────────────
+//
+//  Two-pass roll:
+//    Pass 1 — standard weight-table roll (completely unaffected by luck)
+//    Pass 2 — independent bonus upgrade checks for rarities rarer than
+//             the base result:  bonusChance = (luck − 1) × baseChance
+//
+//  Total effective P(rarity X) ≈ baseChance × luck  (strictly linear ✓)
+//
+// ─── Modifier types ───────────────────────────────────────────────────────────
+//
+//   duration-based  — expires after N milliseconds  (duration: ms)
+//   roll-based      — expires after N rolls          (maxRolls: N)
+//   permanent       — never expires                  (both null)
+//
+//   Duration modifiers decay with ease-out cubic (strong start, gentle tail).
+//   Roll modifiers do NOT decay — they're full strength until the last roll.
+//
+// ─── Adding new crafts ────────────────────────────────────────────────────────
+//
+//   Add to CraftingConfig.js. This file needs zero changes.
 
 export class LuckSystem {
   constructor() {
@@ -22,19 +44,18 @@ export class LuckSystem {
     this.modifiers = [];
   }
 
-  // --- Modifier management --------------------------------------------------
+  // ── Modifier management ────────────────────────────────────────────────────
 
   /**
    * @param {string}      name
-   * @param {number}      multiplier   Raw multiplier value (e.g. 20.0)
+   * @param {number}      multiplier   The displayed luck value (e.g. 18.0 shows as ×18)
    * @param {number|null} duration     Ms until expiry, or null
    * @param {number|null} maxRolls     Roll count until expiry, or null
    */
-  // In LuckSystem.js
   addModifier(name, multiplier, duration = null, maxRolls = null) {
     const existing = this.modifiers.find((m) => m.name === name);
 
-    // If it's a roll-based modifier that already exists, just add the rolls
+    // Roll-based modifier already active → stack rolls instead of resetting
     if (existing && maxRolls !== null && existing.maxRolls !== null) {
       existing.maxRolls += maxRolls;
       return existing;
@@ -56,8 +77,7 @@ export class LuckSystem {
   }
 
   /**
-   * Call once per roll attempt. Ticks down roll-based modifiers and prunes
-   * any that have expired (by roll count or duration).
+   * Call once per roll attempt. Ticks roll-based modifiers and prunes expired ones.
    */
   consumeRoll() {
     for (const m of this.modifiers) {
@@ -66,39 +86,34 @@ export class LuckSystem {
     this._pruneExpired();
   }
 
-  // --- Core calculation -----------------------------------------------------
+  // ── Core calculation ───────────────────────────────────────────────────────
 
   /**
-   * Returns effective luck after:
-   *   1. Pruning expired modifiers
-   *   2. Applying ease-out decay to duration-based modifiers
-   *   3. Stacking bonuses with logarithmic diminishing returns
-   *   4. Clamping to LUCK_CAP
+   * Returns the current luck multiplier — the same number shown in the UI.
+   *
+   * luck = sum of all active modifier values (with decay on duration mods)
+   *
+   * With no active buffs returns baseLuck (1.0).
+   * Clamped to minimum baseLuck so decaying mods can never pull below 1×.
    */
   getCurrentLuck() {
     this._pruneExpired();
 
-    const rawStack = this.modifiers.reduce((acc, m) => {
-      const decayed = m.multiplier * this._decayFactor(m);
-      return acc + (decayed - 1); // Accumulate bonus above 1x
-    }, 0);
+    if (this.modifiers.length === 0) return this.baseLuck;
 
-    if (rawStack <= 0) return this.baseLuck;
+    const sum = this.modifiers.reduce(
+      (acc, m) => acc + m.multiplier * this._decayFactor(m),
+      0,
+    );
 
-    // f(x) = 1 + LOG_SCALE * ln(1 + x / LOG_SCALE)
-    // At rawStack=19 (raw 20x recipe): effective ~4.92 — strong but not trivial
-    // At rawStack=99 (raw 100x recipe): effective ~6.43, clamped to cap
-    const compressed =
-      this.baseLuck + LOG_SCALE * Math.log(1 + rawStack / LOG_SCALE);
-
-    return Math.min(compressed, LUCK_CAP);
+    return Math.max(this.baseLuck, sum);
   }
 
-  /** Ease-out cubic decay for duration-based modifiers. Roll-based = no decay. */
+  /** Ease-out cubic decay for duration-based modifiers (1.0 → 0.0, strong start). */
   _decayFactor(mod) {
-    if (mod.duration === null) return 1.0;
+    if (mod.duration === null) return 1.0; // roll-based and permanent = no decay
     const t = Math.min((Date.now() - mod.startTime) / mod.duration, 1);
-    return 1 - t * t * t; // 1.0 -> 0.0, strong start, gentle tail
+    return 1 - t * t * t;
   }
 
   _pruneExpired() {
@@ -110,30 +125,7 @@ export class LuckSystem {
     });
   }
 
-  // --- Roll resolution -------------------------------------------------------
-
-  /**
-   * Nudges the RNG roll using: nudgedRoll = roll ^ (1 / luck)
-   * Luck biases toward success without guaranteeing it.
-   *
-   * luck=1.0 -> no change
-   * luck=3.0 -> 0.5 roll becomes 0.794
-   * luck=6.0 -> 0.5 roll becomes 0.891
-   *
-   * @param {number} threshold  Base drop chance 0-1 (e.g. 0.01 for 1%)
-   */
-  rollWithLuck(threshold) {
-    const luck = this.getCurrentLuck();
-    const nudgedRoll = Math.pow(Math.random(), 1 / luck);
-    return nudgedRoll >= 1 - threshold;
-  }
-
-  /** Effective drop chance for UI: 1 - (1 - threshold)^luck */
-  effectiveChance(threshold) {
-    return 1 - Math.pow(1 - threshold, this.getCurrentLuck());
-  }
-
-  // --- Inspection ------------------------------------------------------------
+  // ── Inspection ─────────────────────────────────────────────────────────────
 
   getActiveModifiers() {
     this._pruneExpired();
@@ -150,18 +142,32 @@ export class LuckSystem {
     }));
   }
 
+  /**
+   * Debug breakdown for a specific aura rarity.
+   * @param {number} baseChance  e.g. 0.000001 for 1/1,000,000
+   */
+  getLuckBreakdown(baseChance) {
+    const luck = this.getCurrentLuck();
+    const effective = Math.min(baseChance * luck, 1);
+    return {
+      luck: +luck.toFixed(2),
+      baseChance: `1 / ${Math.round(1 / baseChance).toLocaleString()}`,
+      effectiveChance: `1 / ${Math.round(1 / effective).toLocaleString()}`,
+    };
+  }
+
   /** Tier label for UI / audio cues */
   getLuckTier() {
     const luck = this.getCurrentLuck();
-    if (luck < 1.3) return "normal";
-    if (luck < 1.8) return "blessed";
-    if (luck < 2.5) return "favored";
-    if (luck < 3.5) return "divine";
-    if (luck < 5.0) return "transcendent";
+    if (luck < 2) return "normal";
+    if (luck < 5) return "blessed";
+    if (luck < 15) return "favored";
+    if (luck < 50) return "divine";
+    if (luck < 200) return "transcendent";
     return "apex";
   }
 
-  // --- Built-in timed events -------------------------------------------------
+  // ── Built-in timed events ──────────────────────────────────────────────────
 
   activateLuckyStreak() {
     this.addModifier("Lucky Streak", 1.5, 30_000);
